@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Trigonometry: Angle Between Planes</title>
+    <title>3D Trigonometry Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -21,14 +21,22 @@
 
     <!-- UI Overlay -->
     <div class="absolute top-4 left-4 z-10 w-80 panel rounded-xl p-6 border border-gray-200 overflow-y-auto max-h-[90vh]">
-        <h1 class="text-xl font-bold text-gray-800 mb-1">Angles Between Planes</h1>
-        <p class="text-xs text-gray-500 mb-4">Grade 11 Trigonometry Visualization</p>
+        <h1 class="text-xl font-bold text-gray-800 mb-4">3D Trigonometry</h1>
+
+        <!-- Mode Selection -->
+        <div class="mb-6">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Select Concept</label>
+            <div class="flex bg-gray-100 p-1 rounded-lg">
+                <button id="mode-planes" class="flex-1 py-1.5 px-3 rounded-md text-sm font-semibold bg-white shadow-sm text-gray-800 transition-all">Two Planes</button>
+                <button id="mode-line" class="flex-1 py-1.5 px-3 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-700 transition-all">Line & Plane</button>
+            </div>
+        </div>
 
         <!-- Controls -->
         <div class="space-y-6">
 
-            <!-- Shape Selection -->
-            <div>
+            <!-- Planes Mode Controls -->
+            <div id="control-shapes">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Plane Shapes</label>
                 <div class="relative">
                     <select id="shape-select" class="block w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none">
@@ -41,34 +49,53 @@
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                     </div>
                 </div>
-                <!-- Randomize Button (Hidden by default) -->
                 <button id="btn-randomize" class="mt-2 w-full bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-xs font-bold hover:bg-blue-200 transition-colors hidden">
                     🎲 Randomize Top Shape
                 </button>
             </div>
+
+            <!-- Line Mode Controls (Hidden by default) -->
+            <div id="control-line-options" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Plane Orientation</label>
+                <div class="relative mb-4">
+                    <select id="line-orientation" class="block w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none">
+                        <option value="floor">Floor (Horizontal)</option>
+                        <option value="wall">Wall (Vertical)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
+                </div>
+
+                <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
+                    <span>Line Direction</span>
+                    <span id="label-direction" class="text-blue-600">0°</span>
+                </label>
+                <input type="range" id="input-direction" min="0" max="360" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+            </div>
             
-            <!-- Plane Angle Control -->
+            <!-- Angle Control -->
             <div>
                 <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
-                    <span>Opening Angle</span>
-                    <span id="label-plane-angle" class="text-blue-600">60°</span>
+                    <span id="label-angle-title">Opening Angle</span>
+                    <span id="label-plane-angle" class="text-blue-600">45°</span>
                 </label>
-                <input type="range" id="input-plane-angle" min="10" max="90" value="45" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                <input type="range" id="input-plane-angle" min="10" max="85" value="45" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
             </div>
 
-            <!-- Path Skew Control -->
+            <!-- Path/Skew Control -->
             <div>
                 <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
-                    <span>Measurement Path</span>
+                    <span id="label-skew-title">Measurement Path</span>
                     <span id="label-skew" class="text-gray-500">Perpendicular</span>
                 </label>
                 <input type="range" id="input-skew" min="0" max="3" step="0.1" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
-                <p class="text-xs text-gray-500 mt-1">Slide right to measure diagonally.</p>
+                <p id="hint-skew" class="text-xs text-gray-500 mt-1">Slide right to measure diagonally.</p>
             </div>
 
             <!-- 2D Representation -->
             <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <label class="block text-xs font-bold text-gray-600 mb-2 text-center">2D View: Vertical Section</label>
+                <label id="label-2d-title" class="block text-xs font-bold text-gray-600 mb-2 text-center">2D View</label>
                 <canvas id="triangle-2d" width="240" height="140" class="mx-auto"></canvas>
             </div>
 
@@ -87,10 +114,10 @@
         <div class="mt-6 pt-6 border-t border-gray-200">
             <div class="flex justify-between items-end mb-2">
                 <span class="text-sm text-gray-600">Measured Angle:</span>
-                <span id="display-measured-angle" class="text-2xl font-bold text-green-600">60.0°</span>
+                <span id="display-measured-angle" class="text-2xl font-bold text-green-600">45.0°</span>
             </div>
             <div class="flex justify-between items-end mb-2">
-                <span class="text-sm text-gray-600">Hypotenuse Length:</span>
+                <span id="label-result-extra" class="text-sm text-gray-600">Hypotenuse Length:</span>
                 <span id="display-line-length" class="text-lg font-bold text-gray-800">10.0</span>
             </div>
             <div id="status-message" class="text-xs font-bold text-green-600 bg-green-100 p-2 rounded text-center">
@@ -104,23 +131,23 @@
 
     <!-- Legend -->
     <div class="absolute bottom-4 right-4 z-10 panel rounded-lg p-4 text-xs space-y-2 border border-gray-200">
-        <div class="flex items-center">
+        <div id="legend-p1" class="flex items-center">
             <div class="w-3 h-3 bg-blue-400 mr-2 rounded-sm opacity-50"></div> <span>Plane 1 (Top)</span>
         </div>
         <div class="flex items-center">
-            <div class="w-3 h-3 bg-green-400 mr-2 rounded-sm opacity-50"></div> <span>Plane 2 (Ground)</span>
+            <div class="w-3 h-3 bg-green-400 mr-2 rounded-sm opacity-50"></div> <span id="legend-p2-text">Plane 2 (Ground)</span>
         </div>
-        <div class="flex items-center">
+        <div id="legend-spine" class="flex items-center">
             <div class="w-8 h-0.5 bg-black mr-2"></div> <span>Intersection (Spine)</span>
         </div>
-        <div class="flex items-center">
+        <div id="legend-true" class="flex items-center">
             <div class="w-8 h-1 bg-red-500 mr-2 rounded-full"></div> <span>True Angle Line</span>
         </div>
-        <div class="flex items-center">
+        <div id="legend-measure" class="flex items-center">
             <div class="w-8 h-1 bg-yellow-600 mr-2 rounded-full border border-yellow-700"></div> <span>Measured Line</span>
         </div>
         <div class="flex items-center mt-2">
-             <div class="w-8 h-1 bg-black mr-2 rounded-full"></div> <span>Height (Perpendicular)</span>
+             <div class="w-8 h-1 bg-black mr-2 rounded-full"></div> <span>Vertical Drop</span>
         </div>
     </div>
 
@@ -152,8 +179,6 @@
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
         dirLight.position.set(5, 10, 7);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 1024;
-        dirLight.shadow.mapSize.height = 1024;
         scene.add(dirLight);
 
         // --- Helpers ---
@@ -164,80 +189,52 @@
         const bookGroup = new THREE.Group();
         scene.add(bookGroup);
 
-        // 1. Spine
+        // --- Geometries & Materials ---
         const spineGeo = new THREE.CylinderGeometry(0.05, 0.05, 6, 16);
         const spineMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
         const spine = new THREE.Mesh(spineGeo, spineMat);
-        spine.rotation.x = Math.PI / 2; // Lie along Z axis
+        spine.rotation.x = Math.PI / 2; 
         bookGroup.add(spine);
 
-        // --- Geometry Definitions ---
         const planeWidth = 4;
         const planeHeight = 4;
         
-        function createRectGeometry() {
-            const geometry = new THREE.BufferGeometry();
-            const vertices = new Float32Array([
-                0, 0, -planeHeight/2,  
-                planeWidth, 0, -planeHeight/2, 
-                0, 0, planeHeight/2,   
-                planeWidth, 0, planeHeight/2  
-            ]);
-            const indices = [0, 2, 1, 2, 3, 1]; 
-            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-            geometry.setIndex(indices);
-            geometry.computeVertexNormals();
-            return geometry;
-        }
+        // Standard Rect (Offset for Book)
+        const rectGeo = new THREE.BufferGeometry();
+        rectGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+            0, 0, -planeHeight/2, planeWidth, 0, -planeHeight/2, 
+            0, 0, planeHeight/2,  planeWidth, 0, planeHeight/2  
+        ]), 3));
+        rectGeo.setIndex([0, 2, 1, 2, 3, 1]);
+        rectGeo.computeVertexNormals();
 
-        function createTriGeometry() {
-            const geometry = new THREE.BufferGeometry();
-            const vertices = new Float32Array([
-                0, 0, -planeHeight/2, // Spine Top
-                0, 0, planeHeight/2,  // Spine Bottom
-                planeWidth, 0, 0      // Tip
-            ]);
-            const indices = [0, 1, 2];
-            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-            geometry.setIndex(indices);
-            geometry.computeVertexNormals();
-            return geometry;
-        }
+        // Centered Rect (For Line/Plane mode)
+        const groundGeo = new THREE.PlaneGeometry(10, 10);
+        // PlaneGeometry is on XY by default? No, XY. We need XZ for floor.
+        // But we rotate it. Let's keep standard PlaneGeometry (which is XY aligned) 
+        // and rotate it to Horizontal (XZ) or Vertical (XY) as needed.
+        // Actually, PlaneGeometry is X-Y. We usually rotate -90 X to make it floor.
+
+        // Standard Tri
+        const triGeo = new THREE.BufferGeometry();
+        triGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+            0, 0, -planeHeight/2, 0, 0, planeHeight/2, planeWidth, 0, 0
+        ]), 3));
+        triGeo.setIndex([0, 1, 2]);
+        triGeo.computeVertexNormals();
 
         function createIrregularTriGeometry(width, tipZOffset) {
-            const geometry = new THREE.BufferGeometry();
-            const vertices = new Float32Array([
-                0, 0, -planeHeight/2, // 0: Top
-                0, 0, planeHeight/2,  // 1: Bottom
-                width, 0, tipZOffset  // 2: Tip
-            ]);
-            const indices = [0, 1, 2];
-            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-            geometry.setIndex(indices);
-            geometry.computeVertexNormals();
-            return geometry;
+            const g = new THREE.BufferGeometry();
+            g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+                0, 0, -planeHeight/2, 0, 0, planeHeight/2, width, 0, tipZOffset
+            ]), 3));
+            g.setIndex([0, 1, 2]);
+            g.computeVertexNormals();
+            return g;
         }
 
-        const rectGeo = createRectGeometry();
-        const triGeo = createTriGeometry();
-
-        // Materials
-        const matPlane1 = new THREE.MeshStandardMaterial({ 
-            color: 0x60a5fa, 
-            side: THREE.DoubleSide, 
-            transparent: true, 
-            opacity: 0.8,
-            roughness: 0.1,
-            metalness: 0.1
-        });
-        const matPlane2 = new THREE.MeshStandardMaterial({ 
-            color: 0x4ade80, 
-            side: THREE.DoubleSide, 
-            transparent: true, 
-            opacity: 0.8,
-            roughness: 0.1,
-            metalness: 0.1
-        });
+        const matPlane1 = new THREE.MeshStandardMaterial({ color: 0x60a5fa, side: THREE.DoubleSide, transparent: true, opacity: 0.8, roughness: 0.1 });
+        const matPlane2 = new THREE.MeshStandardMaterial({ color: 0x4ade80, side: THREE.DoubleSide, transparent: true, opacity: 0.8, roughness: 0.1 });
 
         const plane1 = new THREE.Mesh(rectGeo, matPlane1);
         const plane2 = new THREE.Mesh(rectGeo, matPlane2);
@@ -245,7 +242,6 @@
         bookGroup.add(plane2);
 
         // --- Thick Lines (Cylinders) ---
-
         function createThickLine(color) {
             const geometry = new THREE.CylinderGeometry(0.04, 0.04, 1, 8);
             const material = new THREE.MeshStandardMaterial({ color: color });
@@ -256,66 +252,33 @@
         function updateThickLine(mesh, start, end) {
             const direction = new THREE.Vector3().subVectors(end, start);
             const length = direction.length();
-            
-            if (length < 0.001) {
-                mesh.visible = false;
-                return;
-            }
+            if (length < 0.001) { mesh.visible = false; return; }
             mesh.visible = true;
-
             mesh.position.copy(start).add(direction.clone().multiplyScalar(0.5));
             mesh.scale.set(1, length, 1);
             const axis = new THREE.Vector3(0, 1, 0); 
             mesh.quaternion.setFromUnitVectors(axis, direction.clone().normalize());
         }
 
-        // True Lines (Perpendicular) - RED
-        const trueLine1 = createThickLine(0xef4444);
-        const trueLine2 = createThickLine(0xef4444);
+        const trueLine1 = createThickLine(0xef4444); // Top Red
+        const trueLine2 = createThickLine(0xef4444); // Bottom Red (Shadow)
         plane1.add(trueLine1);
         plane2.add(trueLine2);
 
-        // Measured Lines (Diagonal/User) - YELLOW
-        const measureLine1 = createThickLine(0xd97706);
-        const measureLine2 = createThickLine(0xd97706);
+        const measureLine1 = createThickLine(0xd97706); // Top Yellow
+        const measureLine2 = createThickLine(0xd97706); // Bottom Yellow
         plane1.add(measureLine1);
         plane2.add(measureLine2);
-        
-        // Drift Lines (Optional visual guide)
-        const driftLine1 = createThickLine(0x4b5563); 
-        const driftLine2 = createThickLine(0x4b5563);
-        driftLine1.visible = false; 
-        driftLine2.visible = false;
-        plane1.add(driftLine1);
-        plane2.add(driftLine2);
 
-        // Connector Line (World Space) - BLACK VERTICAL
-        const connectorLine = createThickLine(0x000000);
+        const connectorLine = createThickLine(0x000000); // Black Vertical
         scene.add(connectorLine);
 
-        // --- Sprites Helper ---
-        function createTextSprite(message, fontSize = 60, color = "#111827") {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 256;
-            canvas.height = 128;
-            
-            ctx.fillStyle = "rgba(0,0,0,0)";
-            ctx.fillRect(0,0,256,128);
-            
-            ctx.font = `Bold ${fontSize}px Arial`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = color;
-            ctx.fillText(message, 128, 64);
-            
-            const texture = new THREE.CanvasTexture(canvas);
-            const spriteMat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
-            const sprite = new THREE.Sprite(spriteMat);
-            return sprite;
-        }
+        // --- Rod for Line/Plane Mode ---
+        const rodLine = createThickLine(0x2563eb); // Blue Rod
+        rodLine.visible = false;
+        scene.add(rodLine);
 
-        // --- Angle Visualization ---
+        // --- Visualization Assets ---
         const angleVizGroup = new THREE.Group();
         scene.add(angleVizGroup);
 
@@ -324,296 +287,430 @@
         const angleArc = new THREE.Mesh(arcGeo, arcMat);
         angleVizGroup.add(angleArc);
 
-        let angleLabelSprite = createTextSprite("60°", 80);
-        angleLabelSprite.scale.set(1.5, 0.75, 1);
-        angleVizGroup.add(angleLabelSprite);
+        function createTextSprite(message, fontSize = 60, color = "#111827") {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 256; canvas.height = 128;
+            ctx.fillStyle = "rgba(0,0,0,0)"; ctx.fillRect(0,0,256,128);
+            ctx.font = `Bold ${fontSize}px Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillStyle = color; ctx.fillText(message, 128, 64);
+            const texture = new THREE.CanvasTexture(canvas);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
+            return sprite;
+        }
 
-        // --- Length Labels ---
-        let lengthLabel1 = createTextSprite("10", 60, "#b91c1c"); 
-        lengthLabel1.scale.set(1.5, 0.75, 1);
-        scene.add(lengthLabel1);
+        let labelSprite = createTextSprite("45°", 80);
+        labelSprite.scale.set(1.5, 0.75, 1);
+        angleVizGroup.add(labelSprite);
 
-        // Slicing Plane
-        const sliceGeo = new THREE.PlaneGeometry(6, 6);
-        const sliceMat = new THREE.MeshStandardMaterial({
-            color: 0xa855f7, // Purple
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.2
-        });
-        const slicePlane = new THREE.Mesh(sliceGeo, sliceMat);
+        let lengthLabel = createTextSprite("10", 60, "#b91c1c");
+        lengthLabel.scale.set(1.5, 0.75, 1);
+        scene.add(lengthLabel);
+
+        const slicePlane = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshStandardMaterial({ color: 0xa855f7, side: THREE.DoubleSide, transparent: true, opacity: 0.2 }));
         slicePlane.visible = false;
         scene.add(slicePlane);
 
-
         // --- State ---
         const state = {
+            mode: 'planes', 
             angle: 45,
-            skew: 0, 
+            skew: 0,
             showSlice: false,
             shapeMode: 'rect-rect',
-            irregularParams: {
-                p1Width: 4,
-                p1TipZ: 1.5,
-                p2Width: 4, 
-                p2TipZ: 0
-            }
+            irregularParams: { p1Width: 4, p1TipZ: 1.5 },
+            lineOrientation: 'floor', // 'floor' or 'wall'
+            lineDirection: 0 // Degrees 0-360
         };
 
-        // --- 2D Canvas Drawing ---
+        // --- 2D Drawing ---
         const ctx2d = document.getElementById('triangle-2d').getContext('2d');
-
-        function draw2DRightTriangle(angleDeg, hypLength) {
-            const w = ctx2d.canvas.width;
-            const h = ctx2d.canvas.height;
-            ctx2d.clearRect(0, 0, w, h);
-
-            const startX = 40;
-            const startY = h - 20;
-            const scale = 7; // Pixels per unit length roughly (hypLength starts at 10)
-            
-            const angleRad = angleDeg * Math.PI / 180;
-            
-            // Hypotenuse length in px
-            // 10 units = 100px roughly
-            const hypPx = hypLength * 12; 
-            
-            // Calculate legs
-            const basePx = hypPx * Math.cos(angleRad);
-            const heightPx = hypPx * Math.sin(angleRad);
-            
-            // Draw Triangle
-            ctx2d.beginPath();
-            ctx2d.moveTo(startX, startY); // Origin
-            ctx2d.lineTo(startX + basePx, startY); // Base
-            ctx2d.lineTo(startX + basePx, startY - heightPx); // Top
-            ctx2d.closePath(); // Back to Origin
-            
-            ctx2d.strokeStyle = "#4b5563";
-            ctx2d.lineWidth = 2;
-            ctx2d.fillStyle = "rgba(75, 85, 99, 0.1)";
-            ctx2d.fill();
-            ctx2d.stroke();
-            
-            // Draw Height Line (Black)
-            ctx2d.beginPath();
-            ctx2d.moveTo(startX + basePx, startY);
-            ctx2d.lineTo(startX + basePx, startY - heightPx);
-            ctx2d.strokeStyle = "#000000";
-            ctx2d.lineWidth = 4;
-            ctx2d.stroke();
-            
-            // Draw Hypotenuse (Yellow/Red)
-            const isRed = (hypLength <= 10.1);
-            ctx2d.beginPath();
-            ctx2d.moveTo(startX, startY);
-            ctx2d.lineTo(startX + basePx, startY - heightPx);
-            ctx2d.strokeStyle = isRed ? "#ef4444" : "#d97706";
-            ctx2d.lineWidth = 4;
-            ctx2d.stroke();
-
-            // Labels
-            ctx2d.font = "bold 12px Arial";
-            ctx2d.fillStyle = "#000000";
-            ctx2d.textAlign = "left";
-            ctx2d.fillText("Height", startX + basePx + 5, startY - heightPx/2);
-            
-            ctx2d.textAlign = "center";
-            ctx2d.fillStyle = isRed ? "#ef4444" : "#d97706";
-            ctx2d.fillText(hypLength, startX + basePx/2, startY - heightPx/2 - 5);
-            
-            // Angle
-            ctx2d.fillStyle = "#000";
-            ctx2d.fillText(`${angleDeg}°`, startX + 40, startY - 5);
-        }
-
 
         // --- Update Function ---
         function updateSimulation() {
-            // 1. Geometric Parameters
-            let currentBaseZ = 0;
-            let currentLineLen = 3;
-
-            if (state.shapeMode === 'rect-rect') {
-                plane1.geometry = rectGeo;
-                plane2.geometry = rectGeo;
-                document.getElementById('btn-randomize').classList.add('hidden');
-            } else if (state.shapeMode === 'tri-rect') {
-                plane1.geometry = triGeo;
-                plane2.geometry = rectGeo;
-                document.getElementById('btn-randomize').classList.add('hidden');
-            } else if (state.shapeMode === 'tri-tri') {
-                plane1.geometry = triGeo;
-                plane2.geometry = triGeo;
-                document.getElementById('btn-randomize').classList.add('hidden');
-            } else if (state.shapeMode === 'tri-irregular') {
-                if (plane1.geometry !== rectGeo && plane1.geometry !== triGeo) plane1.geometry.dispose();
-                plane1.geometry = createIrregularTriGeometry(state.irregularParams.p1Width, state.irregularParams.p1TipZ);
-                currentBaseZ = state.irregularParams.p1TipZ;
-                currentLineLen = state.irregularParams.p1Width;
-                
-                if (plane2.geometry !== rectGeo && plane2.geometry !== triGeo) plane2.geometry.dispose();
-                plane2.geometry = rectGeo; 
-                document.getElementById('btn-randomize').classList.remove('hidden');
-            }
-
             const angleRad = state.angle * Math.PI / 180;
-            
-            // 2. Rotate Planes
-            plane2.rotation.z = 0; // Ground is fixed
-            plane1.rotation.z = angleRad;
-
-            // 3. World Calculations for Connector
-            const zOffset = state.skew * 2; 
             const lift = 0.02;
 
-            // Calculate Tip of Top Measured Line (Yellow/Red) in World Space
-            // Local pos on Plane 1: (currentLineLen, lift, currentBaseZ + zOffset)
-            const p1TipLocal = new THREE.Vector3(currentLineLen, lift, currentBaseZ + zOffset);
-            const p1TipWorld = p1TipLocal.clone().applyMatrix4(plane1.matrixWorld);
-            
-            // Calculate Drop Point (Projection onto Ground / Plane 2)
-            // Ground is at Y=0 (approx, Plane 2 is at Y=0)
-            const pDropWorld = new THREE.Vector3(p1TipWorld.x, 0, p1TipWorld.z);
-            
-            // Spine Origin for this specific slice (on ground)
-            const spineOriginWorld = new THREE.Vector3(0, 0, currentBaseZ + zOffset);
-
-            // 4. Update Lines
-            
-            // Black Vertical Connector
-            updateThickLine(connectorLine, p1TipWorld, pDropWorld);
-            connectorLine.material.color.setHex(0x000000); // Strict black
-
-            // Top Measured Line (Yellow)
-            const skewStartLocal = new THREE.Vector3(0, lift, currentBaseZ); // Anchor at original Z
-            const skewEndLocal = new THREE.Vector3(currentLineLen, lift, currentBaseZ + zOffset); // Tip drifted
-            updateThickLine(measureLine1, skewStartLocal, skewEndLocal);
-            
-            // Calculate skew start in world for label positioning
-            const skewStartWorld = skewStartLocal.clone().applyMatrix4(plane1.matrixWorld);
-
-            // Recalculate World Tip based on skewed line
-            const skewTipWorld = skewEndLocal.clone().applyMatrix4(plane1.matrixWorld);
-            const skewDropWorld = new THREE.Vector3(skewTipWorld.x, 0, skewTipWorld.z);
-            
-            // Recalculate Connector
-            updateThickLine(connectorLine, skewTipWorld, skewDropWorld);
-            
-            // Recalculate Shadow (Plane 2)
-            // Connects Spine Start (Anchor) to Drop Point
-            const m2ShadowStart = new THREE.Vector3(0, lift, currentBaseZ);
-            const m2ShadowEnd = new THREE.Vector3(skewDropWorld.x, lift, skewDropWorld.z);
-            updateThickLine(measureLine2, m2ShadowStart, m2ShadowEnd);
-            
-            // True Lines (Red)
-            const t1StartLocal = new THREE.Vector3(0, lift, currentBaseZ);
-            const t1EndLocal = new THREE.Vector3(currentLineLen, lift, currentBaseZ);
-            updateThickLine(trueLine1, t1StartLocal, t1EndLocal);
-            
-            const t1TipWorld = new THREE.Vector3(currentLineLen, lift, currentBaseZ).applyMatrix4(plane1.matrixWorld);
-            const tDropWorld = new THREE.Vector3(t1TipWorld.x, 0, t1TipWorld.z);
-            
-            const t2StartLocal = new THREE.Vector3(0, lift, currentBaseZ);
-            const t2EndLocal = new THREE.Vector3(tDropWorld.x, lift, tDropWorld.z);
-            updateThickLine(trueLine2, t2StartLocal, t2EndLocal);
-
-            // 5. Measurements
-            const geometricLength = Math.sqrt(currentLineLen*currentLineLen + zOffset*zOffset); // Hypotenuse (Simplified geometric, ignoring lift)
-            const displayLength = ((geometricLength / currentLineLen) * 10).toFixed(1);
-            
-            // Calculate Observed Angle (Mathematically Perfect)
-            // We calculate based on pure geometry, ignoring the visual "lift" offset
-            // Height = L * sin(openAngle)
-            // ProjX  = L * cos(openAngle)
-            // Base   = sqrt(ProjX^2 + zOffset^2)
-            
-            const idealHeight = currentLineLen * Math.sin(angleRad);
-            const idealProjX  = currentLineLen * Math.cos(angleRad);
-            const idealBase   = Math.sqrt(idealProjX*idealProjX + zOffset*zOffset);
-            
-            const measuredAngleRad = Math.atan2(idealHeight, idealBase);
-            const measuredAngleDeg = (measuredAngleRad * 180 / Math.PI).toFixed(1);
-
-            // Update Text
-            document.getElementById('display-line-length').textContent = displayLength;
-            document.getElementById('display-measured-angle').textContent = `${measuredAngleDeg}°`;
-
-            // Position Label
-            // Use skewStartWorld (Start of line) and skewTipWorld (End of line)
-            const labelPos = skewStartWorld.clone().add(skewTipWorld).multiplyScalar(0.5);
-            labelPos.y += 0.3; // Slight lift above the line
-            
-            lengthLabel1.position.copy(labelPos);
-            
-            scene.remove(lengthLabel1);
-            const newLbl = createTextSprite(displayLength, 60, state.skew < 0.1 ? "#059669" : "#dc2626");
-            newLbl.scale.set(1.5, 0.75, 1);
-            newLbl.position.copy(labelPos);
-            lengthLabel1 = newLbl;
-            scene.add(lengthLabel1);
-
-
-            // 6. 2D & Visibility
-            draw2DRightTriangle(measuredAngleDeg, displayLength);
-
-            const statusMsg = document.getElementById('status-message');
-            const skewLabel = document.getElementById('label-skew');
-
-            if (state.skew < 0.1) {
-                measureLine1.visible = false; 
-                measureLine2.visible = false;
-                trueLine1.visible = true;
-                trueLine2.visible = true;
+            if (state.mode === 'planes') {
+                // === PLANES MODE LOGIC ===
                 
-                statusMsg.className = "text-xs font-bold text-green-700 bg-green-100 p-2 rounded text-center";
-                statusMsg.textContent = "CORRECT: Perpendicular";
-                skewLabel.textContent = "Perpendicular";
-                skewLabel.className = "text-green-600 font-bold";
-                document.getElementById('display-measured-angle').className = "text-2xl font-bold text-green-600";
-            } else {
-                measureLine1.visible = true;
-                measureLine2.visible = true;
-                trueLine1.visible = true;
-                trueLine1.material.opacity = 0.3; 
-                trueLine1.material.transparent = true;
-                trueLine2.visible = true;
-                trueLine2.material.opacity = 0.3;
-                trueLine2.material.transparent = true;
+                rodLine.visible = false;
+                plane1.visible = true;
+                plane2.visible = true;
+                spine.visible = true;
+                
+                if (state.shapeMode.startsWith('tri-irregular')) {
+                    if (plane1.geometry !== rectGeo && plane1.geometry !== triGeo) plane1.geometry.dispose();
+                    plane1.geometry = createIrregularTriGeometry(state.irregularParams.p1Width, state.irregularParams.p1TipZ);
+                    plane2.geometry = rectGeo;
+                    var currentBaseZ = state.irregularParams.p1TipZ;
+                    var currentLen = state.irregularParams.p1Width;
+                } else {
+                    plane1.geometry = (state.shapeMode === 'rect-rect') ? rectGeo : triGeo;
+                    plane2.geometry = (state.shapeMode === 'tri-tri') ? triGeo : rectGeo;
+                    var currentBaseZ = 0;
+                    var currentLen = 3;
+                }
 
-                statusMsg.className = "text-xs font-bold text-red-700 bg-red-100 p-2 rounded text-center";
-                statusMsg.textContent = "DISTORTED: Skewed Line";
-                skewLabel.textContent = "Diagonal / Oblique";
-                skewLabel.className = "text-red-600 font-bold";
-                document.getElementById('display-measured-angle').className = "text-2xl font-bold text-red-600";
+                plane2.rotation.set(0,0,0);
+                plane1.rotation.set(0,0, angleRad);
+
+                const zOffset = state.skew * 2;
+                
+                // True Lines (Red)
+                const t1Start = new THREE.Vector3(0, lift, currentBaseZ);
+                const t1End = new THREE.Vector3(currentLen, lift, currentBaseZ);
+                updateThickLine(trueLine1, t1Start, t1End);
+                
+                const tTipWorld = t1End.clone().applyMatrix4(plane1.matrixWorld);
+                const tDropWorld = new THREE.Vector3(tTipWorld.x, 0, tTipWorld.z);
+                const t2Start = new THREE.Vector3(0, lift, currentBaseZ); 
+                const t2End = new THREE.Vector3(tDropWorld.x, lift, tDropWorld.z); 
+                updateThickLine(trueLine2, t2Start, t2End);
+
+                // Measure Lines (Yellow) - Skewed on plane
+                const m1Start = new THREE.Vector3(0, lift, currentBaseZ);
+                const m1End = new THREE.Vector3(currentLen, lift, currentBaseZ + zOffset);
+                updateThickLine(measureLine1, m1Start, m1End);
+
+                const mTipWorld = m1End.clone().applyMatrix4(plane1.matrixWorld);
+                const mDropWorld = new THREE.Vector3(mTipWorld.x, 0, mTipWorld.z);
+
+                const m2Start = new THREE.Vector3(0, lift, currentBaseZ);
+                const m2End = new THREE.Vector3(mDropWorld.x, lift, mDropWorld.z);
+                updateThickLine(measureLine2, m2Start, m2End);
+
+                // Connector
+                updateThickLine(connectorLine, mTipWorld, mDropWorld);
+
+                const hypotenuseLen = m1Start.distanceTo(m1End);
+                const displayLen = ((hypotenuseLen / currentLen) * 10).toFixed(1);
+                const height = mTipWorld.y;
+                const base = Math.sqrt(mDropWorld.x*mDropWorld.x + zOffset*zOffset); 
+                const measuredRad = Math.atan2(height, base);
+                const measuredDeg = (measuredRad * 180 / Math.PI).toFixed(1);
+
+                updateLabels(m1Start.clone().applyMatrix4(plane1.matrixWorld), mTipWorld, displayLen, measuredDeg, state.skew < 0.1);
+                draw2DPlaneView(state.angle, measuredDeg, displayLen, state.skew > 0.1);
+
+                const sliceAngle = Math.atan2(zOffset, mDropWorld.x);
+                updateSlice(mDropWorld.x/2, 1, currentBaseZ + zOffset/2, 0, -sliceAngle, 0, measuredRad, measuredDeg, currentBaseZ);
+
+            } else {
+                // === LINE & PLANE MODE LOGIC ===
+                
+                rodLine.visible = true;
+                plane1.visible = false; 
+                plane2.visible = true; 
+                spine.visible = false; 
+                trueLine1.visible = false; 
+                measureLine1.visible = false; 
+                
+                // Use large centered ground geometry
+                plane2.geometry = groundGeo;
+
+                const L = 4;
+                const dirRad = state.lineDirection * Math.PI / 180;
+                
+                let rodVec, shadowVec;
+                
+                // --- WORLD SPACE CALCULATIONS ---
+                if (state.lineOrientation === 'wall') {
+                    // WALL: Vertical (XY Plane)
+                    plane2.rotation.set(0, 0, Math.PI/2); // Rot Z+90 makes X go to Y, Y go to -X? 
+                    // Let's stick to standard ThreeJS plane is XY.
+                    // If we want it "Vertical", just rotate X -90? No, that's floor.
+                    // Standard PlaneGeometry is XY.
+                    // To make it face +Z (Wall), just position it. No rotation needed if default is XY.
+                    plane2.rotation.set(0, 0, 0); 
+                    
+                    // Rod definition:
+                    // Z is "out".
+                    const z = L * Math.sin(angleRad);
+                    const r_proj = L * Math.cos(angleRad);
+                    const x = r_proj * Math.cos(dirRad);
+                    const y = r_proj * Math.sin(dirRad);
+                    
+                    rodVec = new THREE.Vector3(x, y, z);
+                    shadowVec = new THREE.Vector3(x, y, 0); 
+                    
+                } else {
+                    // FLOOR: Horizontal (XZ Plane)
+                    plane2.rotation.set(-Math.PI/2, 0, 0); // Rot X -90 makes XY -> XZ
+                    
+                    // Rod definition:
+                    // Y is "up".
+                    const y = L * Math.sin(angleRad);
+                    const r_proj = L * Math.cos(angleRad);
+                    const x = r_proj * Math.cos(dirRad);
+                    const z = r_proj * Math.sin(dirRad);
+                    
+                    rodVec = new THREE.Vector3(x, y, z);
+                    shadowVec = new THREE.Vector3(x, 0, z);
+                }
+
+                // Update Rod (Scene Object)
+                updateThickLine(rodLine, new THREE.Vector3(0,0,0), rodVec);
+
+                // --- PROJECTION & TEST LINES (Attached to Plane2) ---
+                // Must convert World Space coordinates to Plane2 Local Space
+                // Important: Update matrix before conversion
+                plane2.updateMatrixWorld();
+                
+                const originLocal = new THREE.Vector3(0,0,0); // Origin is shared
+                // Convert tips to local
+                const shadowTipLocal = plane2.worldToLocal(shadowVec.clone());
+                
+                // Lift slightly in Local Z (which is normal to plane surface)
+                originLocal.z += lift;
+                shadowTipLocal.z += lift;
+                
+                // Draw Projection (Red)
+                updateThickLine(trueLine2, originLocal, shadowTipLocal); 
+
+                // Draw Test Line (Yellow)
+                // World Space rotation calculation
+                const devAngle = state.skew * 20 * Math.PI / 180; 
+                // Rotate shadowVec around plane Normal
+                const normal = (state.lineOrientation === 'wall') ? new THREE.Vector3(0,0,1) : new THREE.Vector3(0,1,0);
+                const testVecWorld = shadowVec.clone().applyAxisAngle(normal, devAngle);
+                
+                if (testVecWorld.length() < 0.01) testVecWorld.set(0.1, 0, 0); // Avoid degenerate
+
+                // Convert to Local
+                const testTipLocal = plane2.worldToLocal(testVecWorld.clone());
+                testTipLocal.z += lift;
+                
+                updateThickLine(measureLine2, originLocal, testTipLocal);
+
+                // Connector (Drop) - Scene Object
+                updateThickLine(connectorLine, rodVec, shadowVec);
+                
+                // --- Angle Calculation ---
+                const v1 = rodVec.clone().normalize();
+                const v2 = testVecWorld.clone().normalize();
+                const dot = v1.dot(v2);
+                const calcRad = Math.acos(Math.min(1, Math.max(-1, dot)));
+                const calcDeg = (calcRad * 180 / Math.PI).toFixed(1);
+
+                // Update UI Text
+                updateLabels(new THREE.Vector3(0,0,0), rodVec, "10.0", calcDeg, state.skew < 0.1);
+
+                draw2DLineMode(state.angle, calcDeg, state.skew > 0.1);
+
+                // Slice/Arc Orientation
+                const planeNorm = new THREE.Vector3().crossVectors(v2, v1).normalize();
+                if (planeNorm.lengthSq() < 0.001) planeNorm.set(1,0,0); 
+                
+                const gx = v2.clone(); // X axis along test line
+                const gz = planeNorm.clone(); // Z axis along normal
+                const gy = new THREE.Vector3().crossVectors(gz, gx).normalize();
+                const m = new THREE.Matrix4().makeBasis(gx, gy, gz);
+                
+                angleVizGroup.position.set(0,0,0);
+                angleVizGroup.setRotationFromMatrix(m);
+                
+                const arcRadius = 1.5;
+                angleArc.geometry.dispose();
+                angleArc.geometry = new THREE.RingGeometry(arcRadius, arcRadius + 0.05, 32, 1, 0, calcRad);
+                
+                angleVizGroup.remove(labelSprite);
+                labelSprite = createTextSprite(`${calcDeg}°`);
+                const lx = (arcRadius + 0.6) * Math.cos(calcRad/2);
+                const ly = (arcRadius + 0.6) * Math.sin(calcRad/2);
+                labelSprite.position.set(lx, ly, 0);
+                angleVizGroup.add(labelSprite);
+                
+                slicePlane.visible = false;
             }
-            
-            // Slicing Plane
-            const sliceAngle = Math.atan2(zOffset, skewDropWorld.x);
-            slicePlane.rotation.set(0, 0, 0);
-            slicePlane.rotation.y = -sliceAngle; 
-            slicePlane.position.set(skewDropWorld.x/2, 1, currentBaseZ + zOffset/2);
-            slicePlane.visible = state.showSlice;
-            
-            // Arc logic
-            angleVizGroup.position.set(0, 0, currentBaseZ);
-            angleVizGroup.rotation.set(0, -sliceAngle, 0); 
-            
-            const arcRadius = 1.5;
-            angleArc.geometry.dispose();
-            angleArc.geometry = new THREE.RingGeometry(arcRadius, arcRadius + 0.05, 32, 1, 0, measuredAngleRad);
-            
-            // Update Angle Label
-            angleVizGroup.remove(angleLabelSprite);
-            angleLabelSprite = createTextSprite(`${measuredAngleDeg}°`);
-            const lx = (arcRadius + 0.6) * Math.cos(measuredAngleRad/2);
-            const ly = (arcRadius + 0.6) * Math.sin(measuredAngleRad/2);
-            angleLabelSprite.position.set(lx, ly, 0); 
-            angleVizGroup.add(angleLabelSprite);
         }
 
+        // --- View Helpers ---
 
-        // --- Event Listeners ---
+        function updateLabels(start, end, lenStr, angStr, isCorrect) {
+            document.getElementById('display-line-length').textContent = lenStr;
+            document.getElementById('display-measured-angle').textContent = `${angStr}°`;
+            const labelPos = start.clone().add(end).multiplyScalar(0.5);
+            labelPos.y += 0.4;
+            if (state.mode === 'line' && state.lineOrientation === 'wall') labelPos.z += 0.4; 
+            
+            lengthLabel.position.copy(labelPos);
+            
+            scene.remove(lengthLabel);
+            const col = isCorrect ? "#059669" : "#dc2626";
+            lengthLabel = createTextSprite(lenStr, 60, col);
+            lengthLabel.scale.set(1.5, 0.75, 1);
+            lengthLabel.position.copy(labelPos);
+            scene.add(lengthLabel);
+
+            const msg = document.getElementById('status-message');
+            const expl = document.getElementById('status-explanation');
+            
+            if (state.mode === 'planes') {
+                if (isCorrect) {
+                    msg.className = "text-xs font-bold text-green-700 bg-green-100 p-2 rounded text-center";
+                    msg.textContent = "CORRECT: Perpendicular";
+                    expl.textContent = "You are measuring perpendicular to the intersection. Shortest distance = Correct Angle.";
+                } else {
+                    msg.className = "text-xs font-bold text-red-700 bg-red-100 p-2 rounded text-center";
+                    msg.textContent = "DISTORTED: Longer Path";
+                    expl.textContent = `The measurement line is longer (${lenStr}). Because the height is constant, a longer hypotenuse means a SMALLER angle.`;
+                }
+            } else {
+                if (isCorrect) {
+                    msg.className = "text-xs font-bold text-green-700 bg-green-100 p-2 rounded text-center";
+                    msg.textContent = "CORRECT: Projection";
+                    expl.textContent = "The angle between a line and plane is defined by its projection. This is the minimum possible angle.";
+                } else {
+                    msg.className = "text-xs font-bold text-red-700 bg-red-100 p-2 rounded text-center";
+                    msg.textContent = "DISTORTED: Deviation";
+                    expl.textContent = `You are measuring against a line rotated away from the projection. This effectively makes the angle LARGER than the true inclination.`;
+                }
+            }
+        }
+
+        function updateSlice(px, py, pz, rx, ry, rz, arcLen, arcDeg, zBase) {
+            slicePlane.rotation.set(Math.PI/2, ry, 0); 
+            slicePlane.position.set(px, py, pz);
+            slicePlane.visible = state.showSlice;
+
+            angleVizGroup.position.set(0, 0, zBase);
+            angleVizGroup.rotation.set(rx, ry, rz);
+
+            const r = 1.5;
+            angleArc.geometry.dispose();
+            angleArc.geometry = new THREE.RingGeometry(r, r + 0.05, 32, 1, 0, arcLen);
+
+            angleVizGroup.remove(labelSprite);
+            labelSprite = createTextSprite(`${arcDeg}°`);
+            labelSprite.position.set((r+0.6)*Math.cos(arcLen/2), (r+0.6)*Math.sin(arcLen/2), 0);
+            angleVizGroup.add(labelSprite);
+        }
+
+        function draw2DPlaneView(trueAng, measAng, len, isSkew) {
+            const w = ctx2d.canvas.width; const h = ctx2d.canvas.height;
+            ctx2d.clearRect(0, 0, w, h);
+            const startX = 40; const startY = h - 20; const scale = 120;
+            const angRad = trueAng * Math.PI / 180; 
+            
+            const height = scale * Math.sin(angRad); 
+            const trueBase = scale * Math.cos(angRad); 
+            const valLen = parseFloat(len);
+            const ratio = valLen / 10;
+            const measHyp = scale * ratio; 
+            const measBase = Math.sqrt(Math.max(0, measHyp*measHyp - height*height));
+
+            const maxBase = Math.max(trueBase, measBase);
+            ctx2d.beginPath(); ctx2d.moveTo(startX, startY); ctx2d.lineTo(startX + maxBase + 20, startY);
+            ctx2d.strokeStyle = "#4ade80"; ctx2d.lineWidth=3; ctx2d.stroke();
+
+            ctx2d.beginPath(); ctx2d.moveTo(startX, startY); ctx2d.lineTo(startX + trueBase, startY - height); 
+            ctx2d.strokeStyle = "rgba(239, 68, 68, 0.3)"; ctx2d.lineWidth=4; ctx2d.stroke();
+            
+            ctx2d.beginPath(); ctx2d.moveTo(startX + trueBase, startY); ctx2d.lineTo(startX + trueBase, startY - height);
+            ctx2d.strokeStyle = "rgba(0, 0, 0, 0.1)"; ctx2d.lineWidth=2; ctx2d.stroke();
+
+            ctx2d.beginPath(); ctx2d.moveTo(startX + measBase, startY); ctx2d.lineTo(startX + measBase, startY - height);
+            ctx2d.strokeStyle = "#000"; ctx2d.lineWidth=3; ctx2d.stroke();
+
+            ctx2d.beginPath(); ctx2d.moveTo(startX, startY); ctx2d.lineTo(startX + measBase, startY - height);
+            ctx2d.strokeStyle = isSkew ? "#d97706" : "#ef4444"; ctx2d.lineWidth=4; ctx2d.stroke();
+            
+            ctx2d.fillStyle = "#000"; ctx2d.font="bold 14px Arial"; ctx2d.fillText(`${measAng}°`, startX+40, startY-10);
+            ctx2d.font="12px Arial"; ctx2d.fillText("Height", startX + measBase + 5, startY - height/2);
+            
+            if(isSkew) {
+                ctx2d.fillStyle = "#ef4444"; ctx2d.fillText("True", startX + trueBase/2 - 10, startY - height/2);
+                ctx2d.fillStyle = "#d97706"; ctx2d.fillText("Measured", startX + measBase/2 + 10, startY - height - 5);
+            }
+        }
+
+        function draw2DLineMode(trueAng, measAng, isSkew) {
+            const w = ctx2d.canvas.width; const h = ctx2d.canvas.height;
+            ctx2d.clearRect(0, 0, w, h);
+            const cx = w/2; const cy = h - 20; const len = 100;
+            
+            const rad1 = trueAng * Math.PI / 180;
+            const x1 = cx + len * Math.cos(rad1); const y1 = cy - len * Math.sin(rad1);
+            
+            const rad2 = measAng * Math.PI / 180; 
+            const x2 = cx + len * Math.cos(rad2); const y2 = cy - len * Math.sin(rad2);
+
+            ctx2d.beginPath(); ctx2d.moveTo(cx-20, cy); ctx2d.lineTo(cx+120, cy); ctx2d.strokeStyle="#4ade80"; ctx2d.stroke();
+
+            ctx2d.beginPath(); ctx2d.moveTo(cx, cy); ctx2d.lineTo(x1, y1);
+            ctx2d.strokeStyle = isSkew ? "rgba(239,68,68,0.3)" : "#ef4444"; ctx2d.lineWidth=4; ctx2d.stroke();
+
+            if (isSkew) {
+                ctx2d.beginPath(); ctx2d.moveTo(cx, cy); ctx2d.lineTo(x2, y2);
+                ctx2d.strokeStyle = "#d97706"; ctx2d.lineWidth=4; ctx2d.stroke();
+                ctx2d.fillStyle = "#d97706"; ctx2d.fillText(`${measAng}°`, x2+5, y2);
+            } else {
+                ctx2d.fillStyle = "#ef4444"; ctx2d.fillText(`${trueAng}°`, x1+5, y1);
+            }
+            
+            ctx2d.fillStyle = "#000"; ctx2d.fillText(isSkew ? "Angle Increases" : "True Inclination", 10, 20);
+        }
+
+        // --- Logic Hooks ---
+        const btnPlanes = document.getElementById('mode-planes');
+        const btnLine = document.getElementById('mode-line');
+        const shapeControl = document.getElementById('control-shapes');
+        const lineControl = document.getElementById('control-line-options');
+        const lblSkew = document.getElementById('label-skew-title');
+        const hintSkew = document.getElementById('hint-skew');
+        const lbl2d = document.getElementById('label-2d-title');
+        const lblAngle = document.getElementById('label-angle-title');
+        const lblExtra = document.getElementById('label-result-extra');
+
+        function setMode(m) {
+            state.mode = m;
+            state.skew = 0; document.getElementById('input-skew').value = 0;
+            state.angle = 45; document.getElementById('input-plane-angle').value = 45;
+            document.getElementById('label-plane-angle').textContent = "45°";
+
+            if (m === 'planes') {
+                btnPlanes.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold bg-white shadow-sm text-gray-800 transition-all";
+                btnLine.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-700 transition-all";
+                shapeControl.style.display = 'block';
+                lineControl.style.display = 'none';
+                lblSkew.textContent = "Measurement Path";
+                hintSkew.textContent = "Slide right to measure diagonally.";
+                lbl2d.textContent = "2D View: Vertical Section";
+                lblAngle.textContent = "Opening Angle";
+                lblExtra.textContent = "Hypotenuse Length:";
+                // Show legend elements
+                document.getElementById('legend-p1').style.display = 'flex';
+                document.getElementById('legend-spine').style.display = 'flex';
+                document.getElementById('legend-p2-text').textContent = "Plane 2 (Ground)";
+                document.getElementById('legend-true').querySelector('span').textContent = "True Angle Line";
+            } else {
+                btnLine.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold bg-white shadow-sm text-gray-800 transition-all";
+                btnPlanes.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-700 transition-all";
+                shapeControl.style.display = 'none';
+                lineControl.style.display = 'block';
+                lblSkew.textContent = "Deviation from Projection";
+                hintSkew.textContent = "Slide right to rotate away from projection.";
+                lbl2d.textContent = "2D View: Side Comparison";
+                lblAngle.textContent = "Line Inclination";
+                lblExtra.textContent = "Fixed Length:";
+                // Hide/Rename legend
+                document.getElementById('legend-p1').style.display = 'none';
+                document.getElementById('legend-spine').style.display = 'none';
+                document.getElementById('legend-true').querySelector('span').textContent = "Projection";
+                updateLegendForOrientation();
+            }
+            updateSimulation();
+        }
+
+        function updateLegendForOrientation() {
+            const txt = state.lineOrientation === 'wall' ? "Vertical Wall" : "Horizontal Ground";
+            document.getElementById('legend-p2-text').textContent = txt;
+        }
+
+        btnPlanes.onclick = () => setMode('planes');
+        btnLine.onclick = () => setMode('line');
+
         document.getElementById('input-plane-angle').addEventListener('input', (e) => {
             state.angle = parseInt(e.target.value);
             document.getElementById('label-plane-angle').textContent = `${state.angle}°`;
@@ -622,6 +719,18 @@
 
         document.getElementById('input-skew').addEventListener('input', (e) => {
             state.skew = parseFloat(e.target.value);
+            updateSimulation();
+        });
+        
+        document.getElementById('line-orientation').addEventListener('change', (e) => {
+            state.lineOrientation = e.target.value;
+            updateLegendForOrientation();
+            updateSimulation();
+        });
+
+        document.getElementById('input-direction').addEventListener('input', (e) => {
+            state.lineDirection = parseInt(e.target.value);
+            document.getElementById('label-direction').textContent = `${state.lineDirection}°`;
             updateSimulation();
         });
 
@@ -641,14 +750,13 @@
              updateSimulation();
         });
 
-        // --- Animation Loop ---
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
             renderer.render(scene, camera);
         }
 
-        updateSimulation();
+        setMode('planes');
         animate();
 
         window.addEventListener('resize', () => {
