@@ -26,17 +26,27 @@
         <!-- Mode Selection -->
         <div class="mb-6">
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Select Concept</label>
-            <div class="flex bg-gray-100 p-1 rounded-lg">
-                <button id="mode-planes" class="flex-1 py-1.5 px-3 rounded-md text-sm font-semibold bg-white shadow-sm text-gray-800 transition-all">Two Planes</button>
-                <button id="mode-line" class="flex-1 py-1.5 px-3 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-700 transition-all">Line & Plane</button>
+            <div class="flex flex-col gap-2 bg-gray-100 p-2 rounded-lg">
+                <div class="flex gap-2">
+                    <!-- HIDDEN as requested -->
+                    <button id="mode-planes" class="hidden flex-1 py-1.5 px-2 rounded-md text-xs font-semibold bg-white shadow-sm text-gray-800 transition-all">Two Planes</button>
+                    <button id="mode-pyramid" class="hidden flex-1 py-1.5 px-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all">Pyramid</button>
+                </div>
+                <div class="flex gap-2">
+                    <!-- HIDDEN as requested -->
+                    <button id="mode-line" class="hidden flex-1 py-1.5 px-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all">Line & Plane</button>
+                    <!-- Visible Modes -->
+                    <button id="mode-box" class="flex-1 py-1.5 px-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all">Rect Prism</button>
+                    <button id="mode-tri-prism" class="flex-1 py-1.5 px-1 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all">Tri Prism</button>
+                </div>
             </div>
         </div>
 
         <!-- Controls -->
         <div class="space-y-6">
 
-            <!-- Planes Mode Controls -->
-            <div id="control-shapes">
+            <!-- Planes Mode Controls (Hidden effectively by logic) -->
+            <div id="control-shapes" class="hidden">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Plane Shapes</label>
                 <div class="relative">
                     <select id="shape-select" class="block w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none">
@@ -54,37 +64,92 @@
                 </button>
             </div>
 
-            <!-- Line Mode Controls (Hidden by default) -->
+            <!-- Pyramid Mode Controls (Hidden) -->
+            <div id="control-pyramid-options" class="hidden">
+               <!-- ... existing pyramid controls ... -->
+            </div>
+
+            <!-- Line Mode Controls (Hidden effectively) -->
             <div id="control-line-options" class="hidden">
+                <!-- ... existing line controls ... -->
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Plane Orientation</label>
                 <div class="relative mb-4">
                     <select id="line-orientation" class="block w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none">
                         <option value="floor">Floor (Horizontal)</option>
                         <option value="wall">Wall (Vertical)</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </div>
                 </div>
-
                 <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
                     <span>Line Direction</span>
                     <span id="label-direction" class="text-blue-600">0°</span>
                 </label>
                 <input type="range" id="input-direction" min="0" max="360" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
             </div>
+
+            <!-- Box/Prism Mode Controls -->
+            <div id="control-box-options" class="hidden">
+                
+                <!-- Function Toggle -->
+                <div class="flex bg-gray-200 p-1 rounded-lg mb-4">
+                    <button id="btn-func-shape" class="flex-1 py-1 px-2 rounded text-xs font-bold bg-white shadow-sm text-blue-600 transition-all">Define Plane</button>
+                    <button id="btn-func-measure" class="flex-1 py-1 px-2 rounded text-xs font-bold text-gray-500 hover:text-gray-700 transition-all">Measure Angle</button>
+                </div>
+
+                <!-- Shape/Plane Definition Mode -->
+                <div id="box-ui-shape">
+                    <p class="text-xs text-gray-500 italic mb-4">Select 3 nodes to create a plane.</p>
+                </div>
+
+                <!-- Measure Mode -->
+                <div id="box-ui-measure" class="hidden">
+                    <p id="measure-instruction" class="text-xs text-blue-600 font-bold italic mb-2">Step 1: Select 2 points for the Line</p>
+                    <div class="flex gap-2 mb-4">
+                        <button id="btn-measure-next" class="flex-1 bg-blue-600 text-white py-1 px-2 rounded text-xs font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Next: Select Plane</button>
+                        <button id="btn-measure-reset" class="px-3 bg-gray-200 text-gray-600 py-1 rounded text-xs font-bold hover:bg-gray-300">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Node Selection Grid -->
+                <div class="grid grid-cols-4 gap-2 mb-4">
+                    <div id="node-checkboxes" class="contents"></div>
+                </div>
+
+                <div class="space-y-4 pt-2 border-t border-gray-100">
+                    <div>
+                        <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
+                            <span>Width (X)</span>
+                            <span id="label-box-w" class="text-blue-600">4.0</span>
+                        </label>
+                        <input type="range" id="input-box-w" min="2" max="6" step="0.5" value="4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    </div>
+                    <div>
+                        <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
+                            <span>Height (Y)</span>
+                            <span id="label-box-h" class="text-blue-600">3.0</span>
+                        </label>
+                        <input type="range" id="input-box-h" min="2" max="6" step="0.5" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    </div>
+                    <div>
+                        <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
+                            <span>Length (Z)</span>
+                            <span id="label-box-d" class="text-blue-600">3.0</span>
+                        </label>
+                        <input type="range" id="input-box-d" min="2" max="6" step="0.5" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    </div>
+                </div>
+            </div>
             
-            <!-- Angle Control -->
-            <div>
+            <!-- Angle Control (Standard) -->
+            <div id="control-main-angle">
                 <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
                     <span id="label-angle-title">Opening Angle</span>
                     <span id="label-plane-angle" class="text-blue-600">45°</span>
                 </label>
-                <input type="range" id="input-plane-angle" min="10" max="85" value="45" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                <input type="range" id="input-plane-angle" min="10" max="80" value="45" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
             </div>
 
             <!-- Path/Skew Control -->
-            <div>
+            <div id="control-skew">
                 <label class="flex justify-between text-sm font-semibold text-gray-700 mb-1">
                     <span id="label-skew-title">Measurement Path</span>
                     <span id="label-skew" class="text-gray-500">Perpendicular</span>
@@ -94,13 +159,13 @@
             </div>
 
             <!-- 2D Representation -->
-            <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <div id="panel-2d" class="bg-gray-50 rounded-lg p-3 border border-gray-200">
                 <label id="label-2d-title" class="block text-xs font-bold text-gray-600 mb-2 text-center">2D View</label>
                 <canvas id="triangle-2d" width="240" height="140" class="mx-auto"></canvas>
             </div>
 
             <!-- Toggles -->
-            <div class="flex items-center justify-between pt-2">
+            <div id="control-slice-toggle" class="flex items-center justify-between pt-2">
                 <span class="text-sm font-medium text-gray-700">Show Slicing Plane</span>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="toggle-slice" class="sr-only peer">
@@ -111,43 +176,40 @@
         </div>
 
         <!-- Result Display -->
-        <div class="mt-6 pt-6 border-t border-gray-200">
+        <div id="panel-results" class="mt-6 pt-6 border-t border-gray-200">
             <div class="flex justify-between items-end mb-2">
-                <span class="text-sm text-gray-600">Measured Angle:</span>
-                <span id="display-measured-angle" class="text-2xl font-bold text-green-600">45.0°</span>
+                <span id="label-result-title" class="text-sm text-gray-600">Target Angle:</span>
+                <span id="display-measured-angle" class="text-2xl font-bold text-green-600">?</span>
             </div>
             <div class="flex justify-between items-end mb-2">
                 <span id="label-result-extra" class="text-sm text-gray-600">Hypotenuse Length:</span>
                 <span id="display-line-length" class="text-lg font-bold text-gray-800">10.0</span>
             </div>
             <div id="status-message" class="text-xs font-bold text-green-600 bg-green-100 p-2 rounded text-center">
-                CORRECT: Shortest Distance
+                PROJECTION VISUALIZED
             </div>
             <p id="status-explanation" class="text-xs text-gray-500 mt-2 leading-relaxed">
-                You are measuring along the perpendicular lines. This is the true definition of the angle.
+                The angle is between the line and its orthogonal projection onto the selected plane.
             </p>
         </div>
     </div>
 
     <!-- Legend -->
-    <div class="absolute bottom-4 right-4 z-10 panel rounded-lg p-4 text-xs space-y-2 border border-gray-200">
+    <div id="panel-legend" class="absolute bottom-4 right-4 z-10 panel rounded-lg p-4 text-xs space-y-2 border border-gray-200">
         <div id="legend-p1" class="flex items-center">
-            <div class="w-3 h-3 bg-blue-400 mr-2 rounded-sm opacity-50"></div> <span>Plane 1 (Top)</span>
+            <div class="w-3 h-3 bg-blue-400 mr-2 rounded-sm opacity-50"></div> <span id="legend-p1-text">Plane 1 (Top)</span>
         </div>
         <div class="flex items-center">
             <div class="w-3 h-3 bg-green-400 mr-2 rounded-sm opacity-50"></div> <span id="legend-p2-text">Plane 2 (Ground)</span>
         </div>
         <div id="legend-spine" class="flex items-center">
-            <div class="w-8 h-0.5 bg-black mr-2"></div> <span>Intersection (Spine)</span>
+            <div class="w-8 h-0.5 bg-black mr-2"></div> <span id="legend-spine-text">Intersection (Edge)</span>
         </div>
         <div id="legend-true" class="flex items-center">
-            <div class="w-8 h-1 bg-red-500 mr-2 rounded-full"></div> <span>True Angle Line</span>
+            <div class="w-8 h-1 bg-red-500 mr-2 rounded-full"></div> <span id="legend-true-text">True Angle Line</span>
         </div>
         <div id="legend-measure" class="flex items-center">
             <div class="w-8 h-1 bg-yellow-600 mr-2 rounded-full border border-yellow-700"></div> <span>Measured Line</span>
-        </div>
-        <div class="flex items-center mt-2">
-             <div class="w-8 h-1 bg-black mr-2 rounded-full"></div> <span>Vertical Drop</span>
         </div>
     </div>
 
@@ -172,13 +234,59 @@
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
 
+        // --- DOM Elements References ---
+        const btnPlanes = document.getElementById('mode-planes');
+        const btnPyramid = document.getElementById('mode-pyramid');
+        const btnLine = document.getElementById('mode-line');
+        const btnBox = document.getElementById('mode-box');
+        const btnTriPrism = document.getElementById('mode-tri-prism');
+        
+        const shapeControl = document.getElementById('control-shapes');
+        const lineControl = document.getElementById('control-line-options');
+        const pyramidControl = document.getElementById('control-pyramid-options');
+        const boxControl = document.getElementById('control-box-options');
+        const mainAngleControl = document.getElementById('control-main-angle');
+        const skewControl = document.getElementById('control-skew');
+        const sliceToggleControl = document.getElementById('control-slice-toggle');
+        
+        const panel2D = document.getElementById('panel-2d');
+        const panelResults = document.getElementById('panel-results');
+        const panelLegend = document.getElementById('panel-legend');
+
+        const lblSkew = document.getElementById('label-skew-title');
+        const hintSkew = document.getElementById('hint-skew');
+        const lbl2d = document.getElementById('label-2d-title');
+        const lblAngle = document.getElementById('label-angle-title');
+        const lblExtra = document.getElementById('label-result-extra');
+
+        // New Box Mode Controls
+        const btnFuncShape = document.getElementById('btn-func-shape');
+        const btnFuncMeasure = document.getElementById('btn-func-measure');
+        const boxUiShape = document.getElementById('box-ui-shape');
+        const boxUiMeasure = document.getElementById('box-ui-measure');
+        const measureInstruction = document.getElementById('measure-instruction');
+        const btnMeasureNext = document.getElementById('btn-measure-next');
+        const btnMeasureReset = document.getElementById('btn-measure-reset');
+
+        // --- Interaction Globals ---
+        let selectedNodes = [];
+        let measureState = {
+            active: false,
+            step: 0, // 0: Select Line (2pts), 1: Select Plane (3 or 4 pts), 2: Result
+            line: [],
+            plane: []
+        };
+        
+        // Node Mapping
+        const nodeMap = { 'A': 7, 'B': 4, 'C': 5, 'D': 6, 'E': 3, 'F': 0, 'G': 1, 'H': 2 };
+        const nodeLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        const reverseNodeMap = { 7: 'A', 4: 'B', 5: 'C', 6: 'D', 3: 'E', 0: 'F', 1: 'G', 2: 'H' };
+
         // --- Lighting ---
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
-
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
         dirLight.position.set(5, 10, 7);
-        dirLight.castShadow = true;
         scene.add(dirLight);
 
         // --- Helpers ---
@@ -189,7 +297,7 @@
         const bookGroup = new THREE.Group();
         scene.add(bookGroup);
 
-        // --- Geometries & Materials ---
+        // --- Geometries ---
         const spineGeo = new THREE.CylinderGeometry(0.05, 0.05, 6, 16);
         const spineMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
         const spine = new THREE.Mesh(spineGeo, spineMat);
@@ -198,36 +306,20 @@
 
         const planeWidth = 4;
         const planeHeight = 4;
-        
-        // Standard Rect (Offset for Book)
         const rectGeo = new THREE.BufferGeometry();
-        rectGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
-            0, 0, -planeHeight/2, planeWidth, 0, -planeHeight/2, 
-            0, 0, planeHeight/2,  planeWidth, 0, planeHeight/2  
-        ]), 3));
+        rectGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0,0,-2, 4,0,-2, 0,0,2, 4,0,2]), 3));
         rectGeo.setIndex([0, 2, 1, 2, 3, 1]);
         rectGeo.computeVertexNormals();
 
-        // Centered Rect (For Line/Plane mode)
         const groundGeo = new THREE.PlaneGeometry(10, 10);
-        // PlaneGeometry is on XY by default? No, XY. We need XZ for floor.
-        // But we rotate it. Let's keep standard PlaneGeometry (which is XY aligned) 
-        // and rotate it to Horizontal (XZ) or Vertical (XY) as needed.
-        // Actually, PlaneGeometry is X-Y. We usually rotate -90 X to make it floor.
-
-        // Standard Tri
         const triGeo = new THREE.BufferGeometry();
-        triGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
-            0, 0, -planeHeight/2, 0, 0, planeHeight/2, planeWidth, 0, 0
-        ]), 3));
+        triGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0,0,-2, 0,0,2, 4,0,0]), 3));
         triGeo.setIndex([0, 1, 2]);
         triGeo.computeVertexNormals();
 
         function createIrregularTriGeometry(width, tipZOffset) {
             const g = new THREE.BufferGeometry();
-            g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
-                0, 0, -planeHeight/2, 0, 0, planeHeight/2, width, 0, tipZOffset
-            ]), 3));
+            g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0,0,-2, 0,0,2, width,0,tipZOffset]), 3));
             g.setIndex([0, 1, 2]);
             g.computeVertexNormals();
             return g;
@@ -235,56 +327,95 @@
 
         const matPlane1 = new THREE.MeshStandardMaterial({ color: 0x60a5fa, side: THREE.DoubleSide, transparent: true, opacity: 0.8, roughness: 0.1 });
         const matPlane2 = new THREE.MeshStandardMaterial({ color: 0x4ade80, side: THREE.DoubleSide, transparent: true, opacity: 0.8, roughness: 0.1 });
+        const matPrism = new THREE.MeshStandardMaterial({ color: 0xe0e7ff, side: THREE.DoubleSide, transparent: true, opacity: 0.5, roughness: 0.1 });
 
         const plane1 = new THREE.Mesh(rectGeo, matPlane1);
         const plane2 = new THREE.Mesh(rectGeo, matPlane2);
         bookGroup.add(plane1);
         bookGroup.add(plane2);
 
-        // --- Thick Lines (Cylinders) ---
+        // Assets for Prism/Box
+        const boxEdgesMesh = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x333333, linewidth: 2 }));
+        scene.add(boxEdgesMesh);
+        
+        const nodesGroup = new THREE.Group();
+        scene.add(nodesGroup);
+        const nodeMeshes = [];
+        const nodeSprites = []; 
+
+        function createLabel(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = "rgba(0,0,0,0)";
+            ctx.font = "Bold 40px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "black";
+            ctx.fillText(text, 32, 32);
+            const tex = new THREE.CanvasTexture(canvas);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+            return sprite;
+        }
+
+        for(let i=0; i<8; i++) {
+            const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), new THREE.MeshBasicMaterial({ color: 0x9ca3af }));
+            nodeMeshes.push(sphere);
+            nodesGroup.add(sphere);
+            const lbl = createLabel(reverseNodeMap[i]);
+            scene.add(lbl);
+            nodeSprites.push(lbl);
+        }
+
+        // Custom Selection Plane (Shape Mode)
+        const customPlane = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
+        scene.add(customPlane);
+        const customPlaneEdges = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xca8a04, linewidth: 2 }));
+        scene.add(customPlaneEdges);
+
+        // --- Measurement Visualization Assets ---
+        const measureGroup = new THREE.Group();
+        scene.add(measureGroup);
+        
+        // Helper Lines for Measure Mode
+        function createLineMesh(color, dashed=false) {
+            const mat = dashed 
+                ? new THREE.LineDashedMaterial({ color: color, dashSize: 0.2, gapSize: 0.1, linewidth: 2 }) 
+                : new THREE.LineBasicMaterial({ color: color, linewidth: 3 });
+            return new THREE.Line(new THREE.BufferGeometry(), mat);
+        }
+        const vizLine = createLineMesh(0x2563eb); // Blue for Selected Line
+        const vizProj = createLineMesh(0x10b981, true); // Green Dashed for Projection
+        const vizDrop1 = createLineMesh(0x9ca3af, true); // Drop line 1
+        const vizDrop2 = createLineMesh(0x9ca3af, true); // Drop line 2
+        measureGroup.add(vizLine, vizProj, vizDrop1, vizDrop2);
+
+        // --- Thick Lines ---
         function createThickLine(color) {
-            const geometry = new THREE.CylinderGeometry(0.04, 0.04, 1, 8);
-            const material = new THREE.MeshStandardMaterial({ color: color });
-            const mesh = new THREE.Mesh(geometry, material);
+            const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1, 8), new THREE.MeshStandardMaterial({ color: color }));
             return mesh;
         }
-
         function updateThickLine(mesh, start, end) {
             const direction = new THREE.Vector3().subVectors(end, start);
-            const length = direction.length();
-            if (length < 0.001) { mesh.visible = false; return; }
+            const len = direction.length();
+            if (len < 0.001) { mesh.visible = false; return; }
             mesh.visible = true;
             mesh.position.copy(start).add(direction.clone().multiplyScalar(0.5));
-            mesh.scale.set(1, length, 1);
-            const axis = new THREE.Vector3(0, 1, 0); 
-            mesh.quaternion.setFromUnitVectors(axis, direction.clone().normalize());
+            mesh.scale.set(1, len, 1);
+            mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
         }
 
-        const trueLine1 = createThickLine(0xef4444); // Top Red
-        const trueLine2 = createThickLine(0xef4444); // Bottom Red (Shadow)
-        plane1.add(trueLine1);
-        plane2.add(trueLine2);
+        const trueLine1 = createThickLine(0xef4444); plane1.add(trueLine1);
+        const trueLine2 = createThickLine(0xef4444); plane2.add(trueLine2);
+        const measureLine1 = createThickLine(0xd97706); plane1.add(measureLine1);
+        const measureLine2 = createThickLine(0xd97706); plane2.add(measureLine2);
+        const connectorLine = createThickLine(0x000000); scene.add(connectorLine);
+        const rodLine = createThickLine(0x2563eb); scene.add(rodLine);
 
-        const measureLine1 = createThickLine(0xd97706); // Top Yellow
-        const measureLine2 = createThickLine(0xd97706); // Bottom Yellow
-        plane1.add(measureLine1);
-        plane2.add(measureLine2);
-
-        const connectorLine = createThickLine(0x000000); // Black Vertical
-        scene.add(connectorLine);
-
-        // --- Rod for Line/Plane Mode ---
-        const rodLine = createThickLine(0x2563eb); // Blue Rod
-        rodLine.visible = false;
-        scene.add(rodLine);
-
-        // --- Visualization Assets ---
+        // --- Angle Visualization ---
         const angleVizGroup = new THREE.Group();
         scene.add(angleVizGroup);
-
-        const arcGeo = new THREE.RingGeometry(1.2, 1.25, 32, 1, 0, 1);
-        const arcMat = new THREE.MeshBasicMaterial({ color: 0x111827, side: THREE.DoubleSide });
-        const angleArc = new THREE.Mesh(arcGeo, arcMat);
+        const angleArc = new THREE.Mesh(new THREE.RingGeometry(1.2, 1.25, 32, 1, 0, 1), new THREE.MeshBasicMaterial({ color: 0x111827, side: THREE.DoubleSide }));
         angleVizGroup.add(angleArc);
 
         function createTextSprite(message, fontSize = 60, color = "#111827") {
@@ -295,476 +426,598 @@
             ctx.font = `Bold ${fontSize}px Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.fillStyle = color; ctx.fillText(message, 128, 64);
             const texture = new THREE.CanvasTexture(canvas);
-            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
-            return sprite;
+            return new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
         }
-
         let labelSprite = createTextSprite("45°", 80);
-        labelSprite.scale.set(1.5, 0.75, 1);
         angleVizGroup.add(labelSprite);
-
         let lengthLabel = createTextSprite("10", 60, "#b91c1c");
-        lengthLabel.scale.set(1.5, 0.75, 1);
         scene.add(lengthLabel);
 
-        const slicePlane = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshStandardMaterial({ color: 0xa855f7, side: THREE.DoubleSide, transparent: true, opacity: 0.2 }));
-        slicePlane.visible = false;
+        // --- Slice Plane ---
+        const slicePlane = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshBasicMaterial({ color: 0xebf0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }));
+        const sliceBorder = new THREE.LineSegments(new THREE.EdgesGeometry(slicePlane.geometry), new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }));
+        slicePlane.add(sliceBorder);
         scene.add(slicePlane);
 
         // --- State ---
         const state = {
-            mode: 'planes', 
-            angle: 45,
-            skew: 0,
-            showSlice: false,
-            shapeMode: 'rect-rect',
-            irregularParams: { p1Width: 4, p1TipZ: 1.5 },
-            lineOrientation: 'floor', // 'floor' or 'wall'
-            lineDirection: 0 // Degrees 0-360
+            mode: 'box', // Default changed from planes to box
+            angle: 45, skew: 0, showSlice: false, shapeMode: 'rect-rect',
+            lineOrientation: 'floor', lineDirection: 0,
+            pyrWidth: 4, pyrHeight: 3,
+            boxDims: { w: 4, h: 3, d: 3 }
         };
 
-        // --- 2D Drawing ---
-        const ctx2d = document.getElementById('triangle-2d').getContext('2d');
+        // --- UI Updates ---
+        const checkContainer = document.getElementById('node-checkboxes');
+        
+        function updateCheckboxes() {
+            checkContainer.innerHTML = '';
+            let activeLabels = nodeLabels; 
+            if (state.mode === 'tri-prism') activeLabels = ['A', 'B', 'C', 'D', 'E', 'F']; 
+            
+            activeLabels.forEach(label => {
+                const wrapper = document.createElement('label');
+                wrapper.className = "flex items-center justify-center space-x-1 cursor-pointer bg-white p-2 rounded border border-gray-200 hover:bg-gray-50";
+                
+                const box = document.createElement('input');
+                box.type = "checkbox";
+                box.value = label;
+                box.id = `check-node-${label}`;
+                box.className = "form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300";
+                
+                const id = nodeMap[label];
+                let isChecked = false;
+                let isDisabled = false;
+
+                if (measureState.active) {
+                    if (measureState.step === 0) {
+                        isChecked = measureState.line.includes(id);
+                        if (!isChecked && measureState.line.length >= 2) isDisabled = true;
+                    } else if (measureState.step === 1) {
+                        isChecked = measureState.plane.includes(id);
+                        // Allow up to 4 points
+                        if (!isChecked && measureState.plane.length >= 4) isDisabled = true;
+                    } else {
+                        isDisabled = true;
+                        isChecked = measureState.line.includes(id) || measureState.plane.includes(id);
+                    }
+                } else {
+                    isChecked = selectedNodes.includes(id);
+                    // Standard Shape Mode: Max 3
+                    if (!isChecked && selectedNodes.length >= 3) isDisabled = true;
+                }
+
+                box.checked = isChecked;
+                box.disabled = isDisabled;
+                
+                box.addEventListener('change', (e) => {
+                    const id = nodeMap[label];
+                    if (measureState.active) {
+                        // Measure Mode Logic
+                        if (measureState.step === 0) {
+                            if (e.target.checked) measureState.line.push(id);
+                            else measureState.line = measureState.line.filter(n => n !== id);
+                            btnMeasureNext.disabled = measureState.line.length !== 2;
+                        } else if (measureState.step === 1) {
+                            if (e.target.checked) measureState.plane.push(id);
+                            else measureState.plane = measureState.plane.filter(n => n !== id);
+                            
+                            // Enable button if 3 or 4 points selected
+                            if (measureState.plane.length >= 3) {
+                                btnMeasureNext.disabled = false;
+                                btnMeasureNext.classList.remove('opacity-50', 'cursor-not-allowed');
+                            } else {
+                                btnMeasureNext.disabled = true;
+                                btnMeasureNext.classList.add('opacity-50', 'cursor-not-allowed');
+                            }
+                        }
+                    } else {
+                        // Standard Mode Logic
+                        if (e.target.checked) {
+                             if(selectedNodes.length < 3) selectedNodes.push(id);
+                        } else {
+                            selectedNodes = selectedNodes.filter(n => n !== id);
+                        }
+                    }
+                    updateCheckboxes();
+                    updateSimulation();
+                });
+
+                const txt = document.createElement('span');
+                txt.className = "text-xs font-bold text-gray-700";
+                txt.textContent = label;
+
+                wrapper.appendChild(box);
+                wrapper.appendChild(txt);
+                
+                // Highlights
+                if (measureState.active) {
+                    if (measureState.line.includes(id)) wrapper.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
+                    if (measureState.plane.includes(id)) wrapper.classList.add('ring-2', 'ring-yellow-400', 'bg-yellow-50');
+                } else {
+                    if (selectedNodes.includes(id)) wrapper.classList.add("ring-2", "ring-yellow-400");
+                }
+
+                checkContainer.appendChild(wrapper);
+            });
+        }
+
+        // --- Measure Mode UI Handlers ---
+        btnFuncShape.onclick = () => {
+            measureState.active = false;
+            measureState.step = 0; measureState.line = []; measureState.plane = [];
+            btnFuncShape.classList.replace('text-gray-500', 'text-blue-600');
+            btnFuncShape.classList.replace('bg-white', 'bg-white'); // keep bg
+            btnFuncShape.classList.add('shadow-sm');
+            btnFuncMeasure.classList.replace('text-blue-600', 'text-gray-500');
+            btnFuncMeasure.classList.remove('shadow-sm', 'bg-white');
+            
+            boxUiShape.style.display = 'block';
+            boxUiMeasure.style.display = 'none';
+            panelResults.style.display = 'none';
+            selectedNodes = [];
+            updateCheckboxes();
+            updateSimulation();
+        };
+
+        btnFuncMeasure.onclick = () => {
+            measureState.active = true;
+            measureState.step = 0; measureState.line = []; measureState.plane = [];
+            
+            btnFuncMeasure.classList.replace('text-gray-500', 'text-blue-600');
+            btnFuncMeasure.classList.add('shadow-sm', 'bg-white');
+            btnFuncShape.classList.replace('text-blue-600', 'text-gray-500');
+            btnFuncShape.classList.remove('shadow-sm', 'bg-white');
+
+            boxUiShape.style.display = 'none';
+            boxUiMeasure.style.display = 'block';
+            measureInstruction.textContent = "Step 1: Select 2 points for the Line";
+            measureInstruction.className = "text-xs text-blue-600 font-bold italic mb-2";
+            btnMeasureNext.textContent = "Next: Select Plane";
+            btnMeasureNext.disabled = true;
+            
+            updateCheckboxes();
+            updateSimulation();
+        };
+
+        btnMeasureNext.onclick = () => {
+            if (measureState.step === 0) {
+                // Move to Plane Selection
+                measureState.step = 1;
+                measureInstruction.textContent = "Step 2: Select 3 or 4 points for the Plane";
+                measureInstruction.className = "text-xs text-yellow-600 font-bold italic mb-2";
+                btnMeasureNext.textContent = "Calculate Angle";
+                btnMeasureNext.disabled = true;
+                updateCheckboxes();
+            } else if (measureState.step === 1) {
+                // Perform Calculation
+                measureState.step = 2;
+                btnMeasureNext.disabled = true;
+                updateSimulation();
+            }
+        };
+
+        btnMeasureReset.onclick = () => {
+            measureState.step = 0; measureState.line = []; measureState.plane = [];
+            measureInstruction.textContent = "Step 1: Select 2 points for the Line";
+            measureInstruction.className = "text-xs text-blue-600 font-bold italic mb-2";
+            btnMeasureNext.textContent = "Next: Select Plane";
+            btnMeasureNext.disabled = true;
+            updateCheckboxes();
+            updateSimulation();
+        };
 
         // --- Update Function ---
         function updateSimulation() {
-            const angleRad = state.angle * Math.PI / 180;
-            const lift = 0.02;
+            // ... (Shared visibility cleanup)
+            const hideAll = () => {
+                plane1.visible = false; plane2.visible = false; spine.visible = false;
+                trueLine1.visible = false; trueLine2.visible = false;
+                measureLine1.visible = false; measureLine2.visible = false;
+                connectorLine.visible = false; rodLine.visible = false;
+                angleVizGroup.visible = false; scene.remove(lengthLabel);
+                slicePlane.visible = false; boxEdgesMesh.visible = false;
+                nodesGroup.visible = false; customPlane.visible = false; customPlaneEdges.visible = false;
+                nodeSprites.forEach(s => s.visible = false);
+                measureGroup.visible = false;
+            };
+            hideAll();
 
-            if (state.mode === 'planes') {
-                // === PLANES MODE LOGIC ===
+            if (state.mode === 'planes' || state.mode === 'line') {
+                if(state.mode === 'planes') {
+                    plane1.visible = true; plane2.visible = true; spine.visible = true;
+                }
+            } 
+            
+            if (state.mode === 'box' || state.mode === 'tri-prism') {
+                boxEdgesMesh.visible = true;
+                nodesGroup.visible = true;
                 
-                rodLine.visible = false;
-                plane1.visible = true;
-                plane2.visible = true;
-                spine.visible = true;
+                // Generate Corners
+                const bw = state.boxDims.w, bh = state.boxDims.h, bd = state.boxDims.d;
+                const halfW = bw/2;
+                let corners = [];
                 
-                if (state.shapeMode.startsWith('tri-irregular')) {
-                    if (plane1.geometry !== rectGeo && plane1.geometry !== triGeo) plane1.geometry.dispose();
-                    plane1.geometry = createIrregularTriGeometry(state.irregularParams.p1Width, state.irregularParams.p1TipZ);
-                    plane2.geometry = rectGeo;
-                    var currentBaseZ = state.irregularParams.p1TipZ;
-                    var currentLen = state.irregularParams.p1Width;
+                if (state.mode === 'box') {
+                    const boxGeom = new THREE.BoxGeometry(bw, bh, bd);
+                    const edgesGeom = new THREE.EdgesGeometry(boxGeom);
+                    boxEdgesMesh.geometry.dispose(); boxEdgesMesh.geometry = edgesGeom;
+                    boxEdgesMesh.position.set(0, bh/2, 0);
+                    corners = [
+                        new THREE.Vector3(halfW, bh, bd/2), new THREE.Vector3(halfW, bh, -bd/2),
+                        new THREE.Vector3(-halfW, bh, -bd/2), new THREE.Vector3(-halfW, bh, bd/2),
+                        new THREE.Vector3(halfW, 0, bd/2), new THREE.Vector3(halfW, 0, -bd/2),
+                        new THREE.Vector3(-halfW, 0, -bd/2), new THREE.Vector3(-halfW, 0, bd/2)
+                    ];
                 } else {
-                    plane1.geometry = (state.shapeMode === 'rect-rect') ? rectGeo : triGeo;
-                    plane2.geometry = (state.shapeMode === 'tri-tri') ? triGeo : rectGeo;
-                    var currentBaseZ = 0;
-                    var currentLen = 3;
+                    // Right Tri Prism
+                    corners[0] = new THREE.Vector3(-halfW, bh, -bd/2); // F
+                    corners[3] = new THREE.Vector3(-halfW, bh, bd/2);  // E
+                    corners[7] = new THREE.Vector3(-halfW, 0, bd/2);   // A
+                    corners[4] = new THREE.Vector3(halfW, 0, bd/2);    // B
+                    corners[5] = new THREE.Vector3(halfW, 0, -bd/2);   // C
+                    corners[6] = new THREE.Vector3(-halfW, 0, -bd/2);  // D
+                    corners[1] = new THREE.Vector3(0,-100,0); corners[2] = new THREE.Vector3(0,-100,0); // Unused
+
+                    const lines = [
+                        corners[7], corners[4], corners[4], corners[3], corners[3], corners[7],
+                        corners[6], corners[5], corners[5], corners[0], corners[0], corners[6],
+                        corners[3], corners[0], corners[7], corners[6], corners[4], corners[5]
+                    ];
+                    boxEdgesMesh.geometry.dispose();
+                    boxEdgesMesh.geometry = new THREE.BufferGeometry().setFromPoints(lines);
+                    boxEdgesMesh.position.set(0,0,0);
                 }
 
-                plane2.rotation.set(0,0,0);
-                plane1.rotation.set(0,0, angleRad);
+                // Node Vis
+                nodeMeshes.forEach((mesh, idx) => {
+                    const sprite = nodeSprites[idx];
+                    if (state.mode === 'tri-prism' && (idx === 1 || idx === 2)) {
+                        mesh.visible = false; sprite.visible = false;
+                    } else if (idx < 8) {
+                        mesh.visible = true; mesh.position.copy(corners[idx]);
+                        sprite.visible = true; 
+                        const offset = corners[idx].clone().sub(new THREE.Vector3(0, bh/2, 0)).normalize().multiplyScalar(0.4);
+                        if (corners[idx].y > 0) offset.y += 0.2;
+                        sprite.position.copy(corners[idx]).add(offset);
+                        
+                        // Color Logic
+                        let highlight = false;
+                        if (measureState.active) {
+                            if (measureState.line.includes(idx)) { mesh.material.color.setHex(0x2563eb); highlight=true; }
+                            else if (measureState.plane.includes(idx)) { mesh.material.color.setHex(0xfacc15); highlight=true; }
+                            else mesh.material.color.setHex(0x9ca3af);
+                        } else {
+                            if (selectedNodes.includes(idx)) { mesh.material.color.setHex(0xfacc15); highlight=true; }
+                            else mesh.material.color.setHex(0x9ca3af);
+                        }
+                        mesh.scale.setScalar(highlight ? 1.5 : 1.0);
+                    }
+                });
 
-                const zOffset = state.skew * 2;
-                
-                // True Lines (Red)
-                const t1Start = new THREE.Vector3(0, lift, currentBaseZ);
-                const t1End = new THREE.Vector3(currentLen, lift, currentBaseZ);
-                updateThickLine(trueLine1, t1Start, t1End);
-                
-                const tTipWorld = t1End.clone().applyMatrix4(plane1.matrixWorld);
-                const tDropWorld = new THREE.Vector3(tTipWorld.x, 0, tTipWorld.z);
-                const t2Start = new THREE.Vector3(0, lift, currentBaseZ); 
-                const t2End = new THREE.Vector3(tDropWorld.x, lift, tDropWorld.z); 
-                updateThickLine(trueLine2, t2Start, t2End);
-
-                // Measure Lines (Yellow) - Skewed on plane
-                const m1Start = new THREE.Vector3(0, lift, currentBaseZ);
-                const m1End = new THREE.Vector3(currentLen, lift, currentBaseZ + zOffset);
-                updateThickLine(measureLine1, m1Start, m1End);
-
-                const mTipWorld = m1End.clone().applyMatrix4(plane1.matrixWorld);
-                const mDropWorld = new THREE.Vector3(mTipWorld.x, 0, mTipWorld.z);
-
-                const m2Start = new THREE.Vector3(0, lift, currentBaseZ);
-                const m2End = new THREE.Vector3(mDropWorld.x, lift, mDropWorld.z);
-                updateThickLine(measureLine2, m2Start, m2End);
-
-                // Connector
-                updateThickLine(connectorLine, mTipWorld, mDropWorld);
-
-                const hypotenuseLen = m1Start.distanceTo(m1End);
-                const displayLen = ((hypotenuseLen / currentLen) * 10).toFixed(1);
-                const height = mTipWorld.y;
-                const base = Math.sqrt(mDropWorld.x*mDropWorld.x + zOffset*zOffset); 
-                const measuredRad = Math.atan2(height, base);
-                const measuredDeg = (measuredRad * 180 / Math.PI).toFixed(1);
-
-                updateLabels(m1Start.clone().applyMatrix4(plane1.matrixWorld), mTipWorld, displayLen, measuredDeg, state.skew < 0.1);
-                draw2DPlaneView(state.angle, measuredDeg, displayLen, state.skew > 0.1);
-
-                const sliceAngle = Math.atan2(zOffset, mDropWorld.x);
-                updateSlice(mDropWorld.x/2, 1, currentBaseZ + zOffset/2, 0, -sliceAngle, 0, measuredRad, measuredDeg, currentBaseZ);
-
-            } else {
-                // === LINE & PLANE MODE LOGIC ===
-                
-                rodLine.visible = true;
-                plane1.visible = false; 
-                plane2.visible = true; 
-                spine.visible = false; 
-                trueLine1.visible = false; 
-                measureLine1.visible = false; 
-                
-                // Use large centered ground geometry
-                plane2.geometry = groundGeo;
-
-                const L = 4;
-                const dirRad = state.lineDirection * Math.PI / 180;
-                
-                let rodVec, shadowVec;
-                
-                // --- WORLD SPACE CALCULATIONS ---
-                if (state.lineOrientation === 'wall') {
-                    // WALL: Vertical (XY Plane)
-                    plane2.rotation.set(0, 0, Math.PI/2); // Rot Z+90 makes X go to Y, Y go to -X? 
-                    // Let's stick to standard ThreeJS plane is XY.
-                    // If we want it "Vertical", just rotate X -90? No, that's floor.
-                    // Standard PlaneGeometry is XY.
-                    // To make it face +Z (Wall), just position it. No rotation needed if default is XY.
-                    plane2.rotation.set(0, 0, 0); 
+                // --- SHAPE MODE LOGIC ---
+                if (!measureState.active && selectedNodes.length === 3) {
+                    customPlane.visible = true; customPlaneEdges.visible = true;
+                    const p1 = corners[selectedNodes[0]], p2 = corners[selectedNodes[1]], p3 = corners[selectedNodes[2]];
+                    const verts = [p1, p2, p3];
+                    customPlane.geometry.dispose();
+                    customPlane.geometry = new THREE.BufferGeometry().setFromPoints(verts);
+                    customPlane.geometry.computeVertexNormals();
+                    customPlaneEdges.geometry.dispose(); 
+                    customPlaneEdges.geometry = new THREE.BufferGeometry().setFromPoints([p1, p2, p2, p3, p3, p1]);
                     
-                    // Rod definition:
-                    // Z is "out".
-                    const z = L * Math.sin(angleRad);
-                    const r_proj = L * Math.cos(angleRad);
-                    const x = r_proj * Math.cos(dirRad);
-                    const y = r_proj * Math.sin(dirRad);
-                    
-                    rodVec = new THREE.Vector3(x, y, z);
-                    shadowVec = new THREE.Vector3(x, y, 0); 
-                    
-                } else {
-                    // FLOOR: Horizontal (XZ Plane)
-                    plane2.rotation.set(-Math.PI/2, 0, 0); // Rot X -90 makes XY -> XZ
-                    
-                    // Rod definition:
-                    // Y is "up".
-                    const y = L * Math.sin(angleRad);
-                    const r_proj = L * Math.cos(angleRad);
-                    const x = r_proj * Math.cos(dirRad);
-                    const z = r_proj * Math.sin(dirRad);
-                    
-                    rodVec = new THREE.Vector3(x, y, z);
-                    shadowVec = new THREE.Vector3(x, 0, z);
+                    // 2D Draw
+                    draw2DBoxTriangle(p1, p2, p3);
                 }
 
-                // Update Rod (Scene Object)
-                updateThickLine(rodLine, new THREE.Vector3(0,0,0), rodVec);
+                // --- MEASURE MODE LOGIC ---
+                if (measureState.active) {
+                    measureGroup.visible = true;
+                    
+                    // Reset colors (in case coming from step 2)
+                    vizLine.material.color.setHex(0x2563eb); // Blue
+                    vizProj.material.color.setHex(0x10b981); // Green
+                    vizDrop1.material.color.setHex(0x9ca3af); // Gray
+                    vizDrop2.material.color.setHex(0x9ca3af); // Gray
 
-                // --- PROJECTION & TEST LINES (Attached to Plane2) ---
-                // Must convert World Space coordinates to Plane2 Local Space
-                // Important: Update matrix before conversion
-                plane2.updateMatrixWorld();
-                
-                const originLocal = new THREE.Vector3(0,0,0); // Origin is shared
-                // Convert tips to local
-                const shadowTipLocal = plane2.worldToLocal(shadowVec.clone());
-                
-                // Lift slightly in Local Z (which is normal to plane surface)
-                originLocal.z += lift;
-                shadowTipLocal.z += lift;
-                
-                // Draw Projection (Red)
-                updateThickLine(trueLine2, originLocal, shadowTipLocal); 
+                    // 1. Draw Line
+                    if (measureState.line.length === 2) {
+                        const p1 = corners[measureState.line[0]];
+                        const p2 = corners[measureState.line[1]];
+                        vizLine.geometry.dispose();
+                        vizLine.geometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+                        vizLine.visible = true;
+                    } else { vizLine.visible = false; }
 
-                // Draw Test Line (Yellow)
-                // World Space rotation calculation
-                const devAngle = state.skew * 20 * Math.PI / 180; 
-                // Rotate shadowVec around plane Normal
-                const normal = (state.lineOrientation === 'wall') ? new THREE.Vector3(0,0,1) : new THREE.Vector3(0,1,0);
-                const testVecWorld = shadowVec.clone().applyAxisAngle(normal, devAngle);
-                
-                if (testVecWorld.length() < 0.01) testVecWorld.set(0.1, 0, 0); // Avoid degenerate
+                    // 2. Draw Plane & Calculate (Only if calculated)
+                    if (measureState.step === 2 && measureState.plane.length >= 3) {
+                        
+                        // Turn lines RED to mark the angle
+                        vizLine.material.color.setHex(0xef4444);
+                        vizProj.material.color.setHex(0xef4444);
+                        vizDrop1.material.color.setHex(0xef4444);
+                        vizDrop2.material.color.setHex(0xef4444);
 
-                // Convert to Local
-                const testTipLocal = plane2.worldToLocal(testVecWorld.clone());
-                testTipLocal.z += lift;
-                
-                updateThickLine(measureLine2, originLocal, testTipLocal);
+                        // Gather points
+                        const points = measureState.plane.map(idx => corners[idx]);
+                        
+                        // Determine Plane Type (3 or 4 points)
+                        if (points.length === 3) {
+                            // Triangle Plane
+                            const pa = points[0], pb = points[1], pc = points[2];
+                            customPlane.visible = true; 
+                            customPlane.geometry.dispose();
+                            customPlane.geometry = new THREE.BufferGeometry().setFromPoints([pa, pb, pc]);
+                            customPlane.geometry.computeVertexNormals();
+                            
+                            customPlaneEdges.visible = true;
+                            customPlaneEdges.geometry.dispose();
+                            customPlaneEdges.geometry = new THREE.BufferGeometry().setFromPoints([pa, pb, pb, pc, pc, pa]);
 
-                // Connector (Drop) - Scene Object
-                updateThickLine(connectorLine, rodVec, shadowVec);
-                
-                // --- Angle Calculation ---
-                const v1 = rodVec.clone().normalize();
-                const v2 = testVecWorld.clone().normalize();
-                const dot = v1.dot(v2);
-                const calcRad = Math.acos(Math.min(1, Math.max(-1, dot)));
-                const calcDeg = (calcRad * 180 / Math.PI).toFixed(1);
+                        } else if (points.length === 4) {
+                            // Quad Plane logic
+                            const center = points.reduce((acc, p) => acc.add(p), new THREE.Vector3()).multiplyScalar(0.25);
+                            const vA = new THREE.Vector3().subVectors(points[1], points[0]);
+                            const vB = new THREE.Vector3().subVectors(points[2], points[0]);
+                            const tempNorm = new THREE.Vector3().crossVectors(vA, vB).normalize();
+                            const refX = new THREE.Vector3().subVectors(points[0], center).normalize();
+                            const refY = new THREE.Vector3().crossVectors(tempNorm, refX).normalize();
+                            
+                            points.sort((a, b) => {
+                                const va = new THREE.Vector3().subVectors(a, center);
+                                const vb = new THREE.Vector3().subVectors(b, center);
+                                const angA = Math.atan2(va.dot(refY), va.dot(refX));
+                                const angB = Math.atan2(vb.dot(refY), vb.dot(refX));
+                                return angA - angB;
+                            });
 
-                // Update UI Text
-                updateLabels(new THREE.Vector3(0,0,0), rodVec, "10.0", calcDeg, state.skew < 0.1);
+                            const pa = points[0], pb = points[1], pc = points[2], pd = points[3];
+                            customPlane.visible = true; 
+                            customPlane.geometry.dispose();
+                            customPlane.geometry = new THREE.BufferGeometry().setFromPoints([pa, pb, pc, pa, pc, pd]);
+                            customPlane.geometry.computeVertexNormals();
+                            customPlaneEdges.visible = true;
+                            customPlaneEdges.geometry.dispose();
+                            customPlaneEdges.geometry = new THREE.BufferGeometry().setFromPoints([pa, pb, pb, pc, pc, pd, pd, pa]);
+                        }
 
-                draw2DLineMode(state.angle, calcDeg, state.skew > 0.1);
+                        if (measureState.line.length === 2) {
+                            const p1 = corners[measureState.line[0]];
+                            const p2 = corners[measureState.line[1]];
+                            const label1 = reverseNodeMap[measureState.line[0]];
+                            const label2 = reverseNodeMap[measureState.line[1]];
+                            
+                            // Calculate Normal (using first 3 points approx)
+                            const pa = points[0], pb = points[1], pc = points[2];
+                            const v1 = new THREE.Vector3().subVectors(pb, pa);
+                            const v2 = new THREE.Vector3().subVectors(pc, pa);
+                            const normal = new THREE.Vector3().crossVectors(v1, v2).normalize();
+                            
+                            // Use centroid for projection reference
+                            const center = points.reduce((acc, p) => acc.add(p), new THREE.Vector3()).multiplyScalar(1/points.length);
 
-                // Slice/Arc Orientation
-                const planeNorm = new THREE.Vector3().crossVectors(v2, v1).normalize();
-                if (planeNorm.lengthSq() < 0.001) planeNorm.set(1,0,0); 
-                
-                const gx = v2.clone(); // X axis along test line
-                const gz = planeNorm.clone(); // Z axis along normal
-                const gy = new THREE.Vector3().crossVectors(gz, gx).normalize();
-                const m = new THREE.Matrix4().makeBasis(gx, gy, gz);
-                
-                angleVizGroup.position.set(0,0,0);
-                angleVizGroup.setRotationFromMatrix(m);
-                
-                const arcRadius = 1.5;
-                angleArc.geometry.dispose();
-                angleArc.geometry = new THREE.RingGeometry(arcRadius, arcRadius + 0.05, 32, 1, 0, calcRad);
-                
-                angleVizGroup.remove(labelSprite);
-                labelSprite = createTextSprite(`${calcDeg}°`);
-                const lx = (arcRadius + 0.6) * Math.cos(calcRad/2);
-                const ly = (arcRadius + 0.6) * Math.sin(calcRad/2);
-                labelSprite.position.set(lx, ly, 0);
-                angleVizGroup.add(labelSprite);
-                
-                slicePlane.visible = false;
+                            // Line Vector
+                            const lineVec = new THREE.Vector3().subVectors(p2, p1).normalize();
+                            
+                            // Angle Calculation
+                            const dot = Math.abs(normal.dot(lineVec));
+                            const angleRad = Math.asin(Math.min(1, dot));
+                            const angleDeg = (angleRad * 180 / Math.PI).toFixed(1);
+
+                            // Project Points
+                            const projP1 = p1.clone().sub(normal.clone().multiplyScalar(p1.clone().sub(center).dot(normal)));
+                            const projP2 = p2.clone().sub(normal.clone().multiplyScalar(p2.clone().sub(center).dot(normal)));
+                            
+                            vizProj.geometry.dispose();
+                            vizProj.geometry = new THREE.BufferGeometry().setFromPoints([projP1, projP2]);
+                            vizProj.computeLineDistances(); 
+                            vizProj.visible = true;
+
+                            vizDrop1.geometry.dispose(); vizDrop1.geometry = new THREE.BufferGeometry().setFromPoints([p1, projP1]); vizDrop1.computeLineDistances();
+                            vizDrop2.geometry.dispose(); vizDrop2.geometry = new THREE.BufferGeometry().setFromPoints([p2, projP2]); vizDrop2.computeLineDistances();
+                            
+                            // --- Determine Labels & Orientation for 2D ---
+                            // Check which point of the line is closer to the plane (the angle vertex)
+                            const d1 = Math.abs(normal.clone().dot(p1.clone().sub(center))); 
+                            const d2 = Math.abs(normal.clone().dot(p2.clone().sub(center)));
+
+                            let vAngle, vTop, lAngle, lTop, vProj, lProj;
+
+                            if (d1 < d2) {
+                                // p1 is on the plane
+                                vAngle = p1; lAngle = label1;
+                                vTop = p2; lTop = label2;
+                            } else {
+                                // p2 is on the plane
+                                vAngle = p2; lAngle = label2;
+                                vTop = p1; lTop = label1;
+                            }
+
+                            // Calculate projection of Top vertex (Right Angle Corner)
+                            const distTop = vTop.clone().sub(center).dot(normal);
+                            vProj = vTop.clone().sub(normal.clone().multiplyScalar(distTop));
+
+                            // Find nearest node for Projection Label
+                            lProj = lTop + "'"; // Default: B -> B'
+                            let minDist = 999;
+                            for(let i=0; i<corners.length; i++) {
+                                const d = vProj.distanceTo(corners[i]);
+                                if(d < 0.1 && d < minDist) {
+                                    minDist = d;
+                                    lProj = reverseNodeMap[i];
+                                }
+                            }
+
+                            const angleName = `∠${lTop}${lAngle}${lProj}`;
+
+                            // UI Feedback
+                            measureInstruction.textContent = `${angleName} = ?`;
+                            measureInstruction.className = "text-sm text-green-600 font-bold bg-green-50 p-2 rounded text-center border border-green-200";
+                            panelResults.style.display = 'block';
+                            document.getElementById('display-measured-angle').textContent = "?"; // Hidden per request
+                            document.getElementById('label-result-title').textContent = `${angleName}`;
+                            document.getElementById('label-result-extra').textContent = "";
+                            document.getElementById('display-line-length').textContent = "";
+                            document.getElementById('status-message').textContent = "PROJECTION VISUALIZED";
+                            document.getElementById('status-explanation').textContent = "The angle is measured between the line and its orthogonal projection onto the selected plane.";
+                            
+                            // 2D View
+                            draw2DProjection(angleDeg, lAngle, lTop, lProj, angleName);
+                        }
+                    } else {
+                        vizProj.visible = false; vizDrop1.visible = false; vizDrop2.visible = false;
+                        if (measureState.active && measureState.step < 2) {
+                             customPlane.visible = false;
+                             customPlaneEdges.visible = false;
+                        }
+                    }
+                }
             }
         }
 
-        // --- View Helpers ---
-
-        function updateLabels(start, end, lenStr, angStr, isCorrect) {
-            document.getElementById('display-line-length').textContent = lenStr;
-            document.getElementById('display-measured-angle').textContent = `${angStr}°`;
-            const labelPos = start.clone().add(end).multiplyScalar(0.5);
-            labelPos.y += 0.4;
-            if (state.mode === 'line' && state.lineOrientation === 'wall') labelPos.z += 0.4; 
-            
-            lengthLabel.position.copy(labelPos);
-            
-            scene.remove(lengthLabel);
-            const col = isCorrect ? "#059669" : "#dc2626";
-            lengthLabel = createTextSprite(lenStr, 60, col);
-            lengthLabel.scale.set(1.5, 0.75, 1);
-            lengthLabel.position.copy(labelPos);
-            scene.add(lengthLabel);
-
-            const msg = document.getElementById('status-message');
-            const expl = document.getElementById('status-explanation');
-            
-            if (state.mode === 'planes') {
-                if (isCorrect) {
-                    msg.className = "text-xs font-bold text-green-700 bg-green-100 p-2 rounded text-center";
-                    msg.textContent = "CORRECT: Perpendicular";
-                    expl.textContent = "You are measuring perpendicular to the intersection. Shortest distance = Correct Angle.";
-                } else {
-                    msg.className = "text-xs font-bold text-red-700 bg-red-100 p-2 rounded text-center";
-                    msg.textContent = "DISTORTED: Longer Path";
-                    expl.textContent = `The measurement line is longer (${lenStr}). Because the height is constant, a longer hypotenuse means a SMALLER angle.`;
-                }
-            } else {
-                if (isCorrect) {
-                    msg.className = "text-xs font-bold text-green-700 bg-green-100 p-2 rounded text-center";
-                    msg.textContent = "CORRECT: Projection";
-                    expl.textContent = "The angle between a line and plane is defined by its projection. This is the minimum possible angle.";
-                } else {
-                    msg.className = "text-xs font-bold text-red-700 bg-red-100 p-2 rounded text-center";
-                    msg.textContent = "DISTORTED: Deviation";
-                    expl.textContent = `You are measuring against a line rotated away from the projection. This effectively makes the angle LARGER than the true inclination.`;
-                }
-            }
+        // --- 2D Helpers ---
+        const ctx2d = document.getElementById('triangle-2d').getContext('2d');
+        
+        function draw2DBoxTriangle(p1, p2, p3) {
+            ctx2d.clearRect(0,0,240,140);
+            ctx2d.fillStyle = "#666"; ctx2d.textAlign="center";
+            ctx2d.font = "italic 14px Arial";
+            ctx2d.fillText("Shape View", 120, 70);
+            ctx2d.font = "12px Arial";
+            ctx2d.fillText("(Plane Selected)", 120, 90);
         }
 
-        function updateSlice(px, py, pz, rx, ry, rz, arcLen, arcDeg, zBase) {
-            slicePlane.rotation.set(Math.PI/2, ry, 0); 
-            slicePlane.position.set(px, py, pz);
-            slicePlane.visible = state.showSlice;
+        function draw2DProjection(angle, labelAngle, labelTop, labelProj, angleName) {
+            const w = 240, h = 140;
+            const ctx = ctx2d;
+            ctx.clearRect(0,0,w,h);
+            
+            // Draw Right Triangle
+            const mX = 50, mY = h-30;
+            const scale = 140;
+            const rad = angle * Math.PI/180;
+            const baseLen = scale * Math.cos(rad);
+            const heightLen = scale * Math.sin(rad);
 
-            angleVizGroup.position.set(0, 0, zBase);
-            angleVizGroup.rotation.set(rx, ry, rz);
+            // Path
+            ctx.beginPath();
+            ctx.moveTo(mX, mY); // Start (Vertex)
+            ctx.lineTo(mX + baseLen, mY); // Base end
+            ctx.lineTo(mX + baseLen, mY - heightLen); // Top
+            ctx.closePath();
 
-            const r = 1.5;
-            angleArc.geometry.dispose();
-            angleArc.geometry = new THREE.RingGeometry(r, r + 0.05, 32, 1, 0, arcLen);
+            // Fill
+            ctx.fillStyle = "rgba(239, 68, 68, 0.05)";
+            ctx.fill();
 
-            angleVizGroup.remove(labelSprite);
-            labelSprite = createTextSprite(`${arcDeg}°`);
-            labelSprite.position.set((r+0.6)*Math.cos(arcLen/2), (r+0.6)*Math.sin(arcLen/2), 0);
-            angleVizGroup.add(labelSprite);
+            // Edges
+            // 1. Base (Projection)
+            ctx.beginPath();
+            ctx.moveTo(mX, mY);
+            ctx.lineTo(mX + baseLen, mY);
+            ctx.strokeStyle = "#ef4444"; 
+            ctx.lineWidth = 4;
+            ctx.setLineDash([5, 3]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Height (Drop)
+            ctx.beginPath();
+            ctx.moveTo(mX + baseLen, mY);
+            ctx.lineTo(mX + baseLen, mY - heightLen);
+            ctx.strokeStyle = "#ef4444"; 
+            ctx.lineWidth = 4;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 3. Hypotenuse (Line)
+            ctx.beginPath();
+            ctx.moveTo(mX, mY);
+            ctx.lineTo(mX + baseLen, mY - heightLen);
+            ctx.strokeStyle = "#ef4444"; 
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Right Angle Mark
+            const raSize = 10;
+            ctx.beginPath();
+            ctx.moveTo(mX + baseLen - raSize, mY);
+            ctx.lineTo(mX + baseLen - raSize, mY - raSize);
+            ctx.lineTo(mX + baseLen, mY - raSize);
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Angle Arc
+            const arcR = 30;
+            ctx.beginPath();
+            ctx.arc(mX, mY, arcR, 0, -rad, true);
+            ctx.strokeStyle = "#000";
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = "#000"; 
+            ctx.textAlign = "center";
+            ctx.font = "bold 16px Arial";
+            
+            // Angle Name
+            ctx.fillText(angleName + " = ?", mX + 45, mY - 5);
+
+            // Vertex Labels
+            ctx.fillStyle = "#2563eb"; // Blue for nodes
+            ctx.fillText(labelAngle, mX - 15, mY + 5); // Angle Node
+            ctx.fillText(labelTop, mX + baseLen + 5, mY - heightLen - 10); // Top Node
+            ctx.fillText(labelProj, mX + baseLen + 15, mY + 5); // Projection Node
+
+            // Side Descriptions
+            ctx.fillStyle = "#666"; 
+            ctx.font = "11px Arial";
+            
+            ctx.fillText("Projection", mX + baseLen/2, mY + 20);
+            
+            ctx.save();
+            ctx.translate(mX + baseLen + 30, mY - heightLen/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText("Height", 0, 0);
+            ctx.restore();
+            
+            ctx.save();
+            ctx.translate(mX + baseLen/2 - 10, mY - heightLen/2 - 10);
+            ctx.rotate(-rad);
+            ctx.fillText("Line", 0, 0);
+            ctx.restore();
         }
 
-        function draw2DPlaneView(trueAng, measAng, len, isSkew) {
-            const w = ctx2d.canvas.width; const h = ctx2d.canvas.height;
-            ctx2d.clearRect(0, 0, w, h);
-            const startX = 40; const startY = h - 20; const scale = 120;
-            const angRad = trueAng * Math.PI / 180; 
-            
-            const height = scale * Math.sin(angRad); 
-            const trueBase = scale * Math.cos(angRad); 
-            const valLen = parseFloat(len);
-            const ratio = valLen / 10;
-            const measHyp = scale * ratio; 
-            const measBase = Math.sqrt(Math.max(0, measHyp*measHyp - height*height));
-
-            const maxBase = Math.max(trueBase, measBase);
-            ctx2d.beginPath(); ctx2d.moveTo(startX, startY); ctx2d.lineTo(startX + maxBase + 20, startY);
-            ctx2d.strokeStyle = "#4ade80"; ctx2d.lineWidth=3; ctx2d.stroke();
-
-            ctx2d.beginPath(); ctx2d.moveTo(startX, startY); ctx2d.lineTo(startX + trueBase, startY - height); 
-            ctx2d.strokeStyle = "rgba(239, 68, 68, 0.3)"; ctx2d.lineWidth=4; ctx2d.stroke();
-            
-            ctx2d.beginPath(); ctx2d.moveTo(startX + trueBase, startY); ctx2d.lineTo(startX + trueBase, startY - height);
-            ctx2d.strokeStyle = "rgba(0, 0, 0, 0.1)"; ctx2d.lineWidth=2; ctx2d.stroke();
-
-            ctx2d.beginPath(); ctx2d.moveTo(startX + measBase, startY); ctx2d.lineTo(startX + measBase, startY - height);
-            ctx2d.strokeStyle = "#000"; ctx2d.lineWidth=3; ctx2d.stroke();
-
-            ctx2d.beginPath(); ctx2d.moveTo(startX, startY); ctx2d.lineTo(startX + measBase, startY - height);
-            ctx2d.strokeStyle = isSkew ? "#d97706" : "#ef4444"; ctx2d.lineWidth=4; ctx2d.stroke();
-            
-            ctx2d.fillStyle = "#000"; ctx2d.font="bold 14px Arial"; ctx2d.fillText(`${measAng}°`, startX+40, startY-10);
-            ctx2d.font="12px Arial"; ctx2d.fillText("Height", startX + measBase + 5, startY - height/2);
-            
-            if(isSkew) {
-                ctx2d.fillStyle = "#ef4444"; ctx2d.fillText("True", startX + trueBase/2 - 10, startY - height/2);
-                ctx2d.fillStyle = "#d97706"; ctx2d.fillText("Measured", startX + measBase/2 + 10, startY - height - 5);
-            }
-        }
-
-        function draw2DLineMode(trueAng, measAng, isSkew) {
-            const w = ctx2d.canvas.width; const h = ctx2d.canvas.height;
-            ctx2d.clearRect(0, 0, w, h);
-            const cx = w/2; const cy = h - 20; const len = 100;
-            
-            const rad1 = trueAng * Math.PI / 180;
-            const x1 = cx + len * Math.cos(rad1); const y1 = cy - len * Math.sin(rad1);
-            
-            const rad2 = measAng * Math.PI / 180; 
-            const x2 = cx + len * Math.cos(rad2); const y2 = cy - len * Math.sin(rad2);
-
-            ctx2d.beginPath(); ctx2d.moveTo(cx-20, cy); ctx2d.lineTo(cx+120, cy); ctx2d.strokeStyle="#4ade80"; ctx2d.stroke();
-
-            ctx2d.beginPath(); ctx2d.moveTo(cx, cy); ctx2d.lineTo(x1, y1);
-            ctx2d.strokeStyle = isSkew ? "rgba(239,68,68,0.3)" : "#ef4444"; ctx2d.lineWidth=4; ctx2d.stroke();
-
-            if (isSkew) {
-                ctx2d.beginPath(); ctx2d.moveTo(cx, cy); ctx2d.lineTo(x2, y2);
-                ctx2d.strokeStyle = "#d97706"; ctx2d.lineWidth=4; ctx2d.stroke();
-                ctx2d.fillStyle = "#d97706"; ctx2d.fillText(`${measAng}°`, x2+5, y2);
-            } else {
-                ctx2d.fillStyle = "#ef4444"; ctx2d.fillText(`${trueAng}°`, x1+5, y1);
-            }
-            
-            ctx2d.fillStyle = "#000"; ctx2d.fillText(isSkew ? "Angle Increases" : "True Inclination", 10, 20);
-        }
-
-        // --- Logic Hooks ---
-        const btnPlanes = document.getElementById('mode-planes');
-        const btnLine = document.getElementById('mode-line');
-        const shapeControl = document.getElementById('control-shapes');
-        const lineControl = document.getElementById('control-line-options');
-        const lblSkew = document.getElementById('label-skew-title');
-        const hintSkew = document.getElementById('hint-skew');
-        const lbl2d = document.getElementById('label-2d-title');
-        const lblAngle = document.getElementById('label-angle-title');
-        const lblExtra = document.getElementById('label-result-extra');
-
+        // --- Init ---
         function setMode(m) {
             state.mode = m;
-            state.skew = 0; document.getElementById('input-skew').value = 0;
-            state.angle = 45; document.getElementById('input-plane-angle').value = 45;
-            document.getElementById('label-plane-angle').textContent = "45°";
-
-            if (m === 'planes') {
-                btnPlanes.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold bg-white shadow-sm text-gray-800 transition-all";
-                btnLine.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-700 transition-all";
-                shapeControl.style.display = 'block';
-                lineControl.style.display = 'none';
-                lblSkew.textContent = "Measurement Path";
-                hintSkew.textContent = "Slide right to measure diagonally.";
-                lbl2d.textContent = "2D View: Vertical Section";
-                lblAngle.textContent = "Opening Angle";
-                lblExtra.textContent = "Hypotenuse Length:";
-                // Show legend elements
-                document.getElementById('legend-p1').style.display = 'flex';
-                document.getElementById('legend-spine').style.display = 'flex';
-                document.getElementById('legend-p2-text').textContent = "Plane 2 (Ground)";
-                document.getElementById('legend-true').querySelector('span').textContent = "True Angle Line";
-            } else {
-                btnLine.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold bg-white shadow-sm text-gray-800 transition-all";
-                btnPlanes.className = "flex-1 py-1.5 px-3 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-700 transition-all";
-                shapeControl.style.display = 'none';
-                lineControl.style.display = 'block';
-                lblSkew.textContent = "Deviation from Projection";
-                hintSkew.textContent = "Slide right to rotate away from projection.";
-                lbl2d.textContent = "2D View: Side Comparison";
-                lblAngle.textContent = "Line Inclination";
-                lblExtra.textContent = "Fixed Length:";
-                // Hide/Rename legend
-                document.getElementById('legend-p1').style.display = 'none';
-                document.getElementById('legend-spine').style.display = 'none';
-                document.getElementById('legend-true').querySelector('span').textContent = "Projection";
-                updateLegendForOrientation();
-            }
+            shapeControl.style.display = m === 'planes' ? 'block' : 'none';
+            lineControl.style.display = m === 'line' ? 'block' : 'none';
+            pyramidControl.style.display = m === 'pyramid' ? 'block' : 'none';
+            boxControl.style.display = (m === 'box' || m === 'tri-prism') ? 'block' : 'none';
+            mainAngleControl.style.display = (m === 'planes' || m === 'line') ? 'block' : 'none';
+            
+            // Mode switching resets
+            measureState.active = false; 
+            btnFuncShape.click(); // Default to shape view
             updateSimulation();
         }
 
-        function updateLegendForOrientation() {
-            const txt = state.lineOrientation === 'wall' ? "Vertical Wall" : "Horizontal Ground";
-            document.getElementById('legend-p2-text').textContent = txt;
-        }
-
+        // --- Handlers ---
         btnPlanes.onclick = () => setMode('planes');
         btnLine.onclick = () => setMode('line');
+        btnBox.onclick = () => setMode('box');
+        btnTriPrism.onclick = () => setMode('tri-prism');
+        // ... (Other standard handlers) ...
+        document.getElementById('input-box-w').addEventListener('input', (e) => { state.boxDims.w = parseFloat(e.target.value); updateSimulation(); });
+        document.getElementById('input-box-h').addEventListener('input', (e) => { state.boxDims.h = parseFloat(e.target.value); updateSimulation(); });
+        document.getElementById('input-box-d').addEventListener('input', (e) => { state.boxDims.d = parseFloat(e.target.value); updateSimulation(); });
 
-        document.getElementById('input-plane-angle').addEventListener('input', (e) => {
-            state.angle = parseInt(e.target.value);
-            document.getElementById('label-plane-angle').textContent = `${state.angle}°`;
-            updateSimulation();
-        });
-
-        document.getElementById('input-skew').addEventListener('input', (e) => {
-            state.skew = parseFloat(e.target.value);
-            updateSimulation();
-        });
-        
-        document.getElementById('line-orientation').addEventListener('change', (e) => {
-            state.lineOrientation = e.target.value;
-            updateLegendForOrientation();
-            updateSimulation();
-        });
-
-        document.getElementById('input-direction').addEventListener('input', (e) => {
-            state.lineDirection = parseInt(e.target.value);
-            document.getElementById('label-direction').textContent = `${state.lineDirection}°`;
-            updateSimulation();
-        });
-
-        document.getElementById('toggle-slice').addEventListener('change', (e) => {
-            state.showSlice = e.target.checked;
-            updateSimulation();
-        });
-
-        document.getElementById('shape-select').addEventListener('change', (e) => {
-            state.shapeMode = e.target.value;
-            updateSimulation();
-        });
-        
-        document.getElementById('btn-randomize').addEventListener('click', () => {
-             state.irregularParams.p1Width = 3.5 + Math.random() * 1.5;
-             state.irregularParams.p1TipZ = (Math.random() - 0.5) * 4;
-             updateSimulation();
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        setMode('planes');
+        setMode('box'); // Set default mode to box
+        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
         animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
     </script>
 </body>
 </html>
